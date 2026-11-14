@@ -1,6 +1,7 @@
 import { Archive, ArrowDownToLine, FileSpreadsheet, FileText, FolderOpen } from "lucide-react";
 import { SourceTraceabilityTable } from "../components/SourceTraceabilityTable";
 import { ScientificCaveat } from "../components/ScientificCaveat";
+import { PageFinding, PageSummary } from "../components/PageFinding";
 
 const sourceFiles = [
   { name: "sep_26g4.areaAvgTimeSeries.GPM_3IMERGDL_07_precipitation.20260901-20260930.170W_5S_120W_5N.csv", kind: "NASA Giovanni CSV", description: "Daily GPM IMERG v07 precipitation · 1–30 September 2026 · 170°W–120°W, 5°S–5°N" },
@@ -14,6 +15,8 @@ const sourceFiles = [
 export function DatasetsPage() {
   return (
     <section className="page-section datasets-page">
+      <PageSummary>Review the preserved source files and trace displayed values to their agencies, domains, periods, methods, and destinations.</PageSummary>
+      <PageFinding value="10" result="Parameters traced" meaning="Source-to-visualization records and the raw-file manifest document where displayed values come from." />
       <div className="page-intro">
         <div><div className="eyebrow">Sources · periods · methods</div><h2>Dataset provenance</h2><p>Trace each displayed value back to its agency, product, spatial domain, period, baseline, calculation, and destination.</p></div>
         <span className="badge"><span className="badge-dot" />Verified Source Data</span>
@@ -32,7 +35,7 @@ export function DatasetsPage() {
             return <article key={file.name} className="raw-file-row"><span className="raw-file-icon"><Icon size={17} /></span><div className="raw-file-copy"><strong>{file.name}</strong><span>{file.description}</span></div><span className="raw-file-kind">{file.kind}</span></article>;
           })}
         </div>
-        <div className="reproducibility-note"><FolderOpen size={15} /><span>Typed chart modules are reproducible from the preserved source files with <code>npm run data:extract</code>; <code>npm run data:check</code> validates the raw records and generated modules.</span><ArrowDownToLine size={15} /></div>
+        <details className="method-details"><summary>How this was calculated</summary><div className="method-details-content"><div className="reproducibility-note"><FolderOpen size={15} /><span>Typed chart modules are reproducible from the preserved source files with <code>npm run data:extract</code>; <code>npm run data:check</code> validates the raw records and generated modules.</span><ArrowDownToLine size={15} /></div></div></details>
       </section>
 
       <div className="data-freeze-note"><strong>Data freeze · 13 November 2026</strong><span>This application serves the preserved, locally bundled observations and documented headline values. It does not use demo series or a backend feed.</span></div>

@@ -3,11 +3,14 @@ import "../phase3.css";
 import { ArrowUpRight, BookOpen, GraduationCap, ShieldCheck } from "lucide-react";
 import { ScientificCaveat } from "../components/ScientificCaveat";
 import { phase3Data } from "../data/phase3Data";
+import { PageFinding, PageSummary } from "../components/PageFinding";
 
 export function Phase3Page() {
   const impact = phase3Data.historicalStats.cseJanSep2026;
   return (
     <section className="page-section phase3-page">
+      <PageSummary>Explore educational preparedness material, official guidance links, and a retrospective record of reported impacts.</PageSummary>
+      <PageFinding value={impact.extremeWeatherDays} result="Historical impact context" meaning="Reported impacts are retrospective; this preparedness module is educational and does not make predictions." />
       <div className="prepared-banner">
         <div className="prepared-symbol"><ShieldCheck size={27} /></div>
         <div><div className="eyebrow">Phase 3 · educational preparedness</div><h2>Prepared. Not panicked.</h2><p>{phase3Data.scope}</p></div>

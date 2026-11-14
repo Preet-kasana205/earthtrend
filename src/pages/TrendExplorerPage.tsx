@@ -5,6 +5,7 @@ import { Activity, Droplets, Waves, Wind } from "lucide-react";
 import { ScientificBarChart } from "../components/ScientificBarChart";
 import { ScientificLineChart } from "../components/ScientificLineChart";
 import { ScientificCaveat } from "../components/ScientificCaveat";
+import { PageFinding, PageSummary } from "../components/PageFinding";
 import { nino34, ssh, thermocline } from "../data/realData";
 import { oras5ThermoclineData } from "../data/oras5ThermoclineData";
 import { pacificDailyRainfall2026 } from "../data/pacificDailyRainfall2026";
@@ -81,9 +82,26 @@ export function TrendExplorerPage() {
     nino34: "Significance not assessed: only two monthly observations are available (September +2.1°C and October +2.5°C), too short for a trend test.",
     "modis-aqua": "This is ABSOLUTE SST in °C, not an anomaly. No significant long-term trend is detected; ENSO variability dominates over this 23-year record. CPC Niño-3.4 anomalies are shown in a separate panel with their own ERSST 1991–2020 baseline.",
   }[variable];
+  const selectedTrend = variable === "soil-moisture"
+    ? (region === "Rajasthan" ? rajasthanTrend : assamTrend)
+    : variable === "pacific-rainfall" ? baselineSeptemberTrend
+      : variable === "oras5" ? oras5Trend
+        : variable === "modis-aqua" ? modisAquaTrend : null;
+  const findingValue = selectedTrend
+    ? `${selectedTrend.senSlopePerYear > 0 ? "+" : ""}${selectedTrend.senSlopePerYear.toFixed(6)} ${variable === "soil-moisture" ? "kg/m²/year" : variable === "pacific-rainfall" ? "mm/day/year" : variable === "modis-aqua" ? "°C/year" : variable === "oras5" ? "source-value units/year" : ""}`
+    : `+${nino34.oct2026Monthly}°C`;
+  const findingResult = selectedTrend?.significanceLabel ?? "Significance not assessed";
+  const findingMeaning = variable === "soil-moisture"
+    ? `${region} monthly soil moisture trend; seasonality and serial autocorrelation are not adjusted. A rising annual mean does not rule out droughts.`
+    : variable === "pacific-rainfall" ? "This trend uses 19 computed annual September means; the separate September 2026 daily chart is descriptive."
+      : variable === "oras5" ? "The unit remains unconfirmed; source values are not labelled metres. Seasonality and serial autocorrelation are not adjusted."
+        : variable === "modis-aqua" ? "ABSOLUTE SST in °C, not an anomaly; ENSO variability dominates over this 23-year record."
+          : "Only September and October monthly anomalies are available, too few for a trend test.";
 
   return (
     <section className="page-section trend-page">
+      <PageSummary>Inspect original observations and computed trends for the selected variable. Each chart retains its source, period, units, and caveats.</PageSummary>
+      <PageFinding value={findingValue} result={findingResult} meaning={findingMeaning} />
       <div className="page-intro">
         <div><div className="eyebrow">Observed time series</div><h2>Explore the records</h2><p>Choose a source series to view its original observations. The charts do not fill missing dates or interpolate values.</p></div>
         <div className="trend-observation-count"><Activity size={15} /><span className="mono">5 selectable variables · GLDAS 312/monthly per region</span></div>

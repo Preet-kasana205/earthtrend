@@ -2,6 +2,7 @@ import "../methodology.css";
 import { Activity, Check, ClipboardCheck, Database, ShieldAlert } from "lucide-react";
 import { ScientificCaveat } from "../components/ScientificCaveat";
 import { thermocline } from "../data/realData";
+import { PageFinding, PageSummary } from "../components/PageFinding";
 
 const checks = [
   "Exactly 815 monthly observations",
@@ -14,6 +15,8 @@ const checks = [
 export function MethodologyPage() {
   return (
     <section className="page-section methodology-page">
+      <PageSummary>Review the calculations, source checks, statistical methods, and safeguards used to present the observations.</PageSummary>
+      <PageFinding value="α = 0.05" result="Documented decision threshold" meaning="Trend tests use the shared Theil–Sen and two-sided Mann–Kendall method where a sufficiently long time series is available." />
       <div className="page-intro">
         <div><div className="eyebrow">Reproducibility · caveats · definitions</div><h2>How the numbers are made</h2><p>Calculations below are deterministic summaries of the preserved observations. Each comparison keeps its source period and variable definition.</p></div>
       </div>
@@ -28,6 +31,7 @@ export function MethodologyPage() {
           <div><span>Unit</span><strong>mm/day</strong></div>
           <div><span>Baseline</span><strong>570 September daily observations · 2001–2019</strong></div>
         </div>
+        <details className="method-details"><summary>How this was calculated</summary><div className="method-details-content">
         <div className="formula-block" aria-label="Pacific rainfall calculation">
           <div className="formula-heading"><ClipboardCheck size={15} />Reproducible calculation</div>
           <div className="formula-line"><span>September 2026</span><code>30 daily observations · Σ = 132.9762 mm</code></div>
@@ -37,15 +41,18 @@ export function MethodologyPage() {
           <div className="formula-line"><span>Trend input</span><code>19 annual September means, each computed from 30 daily observations (2001–2019)</code></div>
         </div>
         <div className="method-source"><Database size={14} /><span>Raw source files: NASA Giovanni September 2026 CSV and 2001–2020 CSV in <code>src/data/raw/</code>. The baseline calculation uses only September dates in 2001–2019. A Theil–Sen slope and standard two-sided Mann–Kendall test use the 19 computed annual means; serial autocorrelation is not adjusted.</span></div>
+        </div></details>
       </article>
 
       <article className="method-chapter surface surface-pad">
         <div className="chapter-kicker"><span>02</span><div className="eyebrow">ORAS5 data quality</div></div>
         <h3>Historical source values, one location, units unconfirmed</h3>
         <p className="method-lead">The chart series is extracted from the workbook’s “Monthly Data” worksheet. The source field is named “Depth of 20C isotherm (source value; confirm units)”. Its measurement units have not been confirmed, so the chart and annualized Sen slope use source values and never call them metres. The Trend Explorer tests all 815 monthly records with the standard two-sided Mann–Kendall test; there is no seasonal or serial-autocorrelation correction.</p>
+        <details className="method-details"><summary>How this was calculated</summary><div className="method-details-content">
         <div className="quality-grid"><div className="quality-count"><strong>815</strong><span>monthly rows</span></div><div className="quality-period"><span className="mono">JAN 1958 — NOV 2025</span><span>{thermocline.location}</span></div></div>
         <ul className="quality-check-list">{checks.map((check) => <li key={check}><Check size={14} />{check}</li>)}</ul>
         <div className="method-source"><Database size={14} /><span>Original source: <code>src/data/raw/ORAS5_Thermocline_Cleaned_1958_2025_No_Readme.xlsx</code>. No 2026 ORAS5 values are added.</span></div>
+        </div></details>
       </article>
 
       <article className="method-chapter surface surface-pad">
@@ -58,6 +65,7 @@ export function MethodologyPage() {
           <div><span>Unit</span><strong>kg/m²</strong></div>
           <div><span>Period</span><strong>312 monthly observations per region · 2000–2025</strong></div>
         </div>
+        <details className="method-details"><summary>How this was calculated</summary><div className="method-details-content">
         <div className="formula-block" aria-label="GLDAS trend method">
           <div className="formula-heading"><Activity size={15} />Computed from the full monthly series</div>
           <div className="formula-line"><span>Slope</span><code>Theil–Sen median of pairwise slopes, annualized by elapsed calendar time</code></div>
@@ -66,6 +74,7 @@ export function MethodologyPage() {
           <div className="formula-line formula-result"><span>Scope</span><code>No seasonal stratification or serial-autocorrelation correction</code></div>
         </div>
         <div className="method-source"><Database size={14} /><span>Sources: both original GLDAS CSVs under <code>src/data/raw/</code>. Extraction is reproducible with <code>python scripts/extractGldasSoilMoisture.py</code>. A rising annual-mean soil moisture value does not mean droughts did not occur.</span></div>
+        </div></details>
       </article>
 
       <article className="method-chapter safeguard-chapter surface-raised surface-pad">
@@ -78,6 +87,7 @@ export function MethodologyPage() {
           <div><span>Region</span><strong>170°W–120°W · 5°S–5°N</strong></div>
           <div><span>Period / unit</span><strong>Aug 2002–Dec 2025 · 281 months · °C</strong></div>
         </div>
+        <details className="method-details"><summary>How this was calculated</summary><div className="method-details-content">
         <div className="formula-block" aria-label="MODIS Aqua trend method">
           <div className="formula-heading"><Activity size={15} />Computed from all month-normalized observations</div>
           <div className="formula-line"><span>Slope</span><code>Shared Theil–Sen engine · annualized by elapsed calendar time</code></div>
@@ -85,6 +95,7 @@ export function MethodologyPage() {
           <div className="formula-line formula-result"><span>Caveat</span><code>No seasonal stratification or serial-autocorrelation correction; ENSO variability dominates over this 23-year record.</code></div>
         </div>
         <div className="method-source"><Database size={14} /><span>The MODIS absolute SST trend is separate from the two NOAA CPC monthly Niño-3.4 anomaly values. Those CPC values (+2.1°C in September and +2.5°C in October 2026) use their own ERSST 1991–2020 baseline and are too few for a trend test.</span></div>
+        </div></details>
       </article>
 
       <article className="method-chapter safeguard-chapter surface-raised surface-pad">
@@ -101,10 +112,10 @@ export function MethodologyPage() {
         <div className="method-source"><ShieldAlert size={14} /><span>Trend tests are documented for GLDAS, ORAS5, MODIS Aqua absolute SST and annual September baseline means. No test is run on the two-month CPC Niño-3.4 anomaly record or the single-season monsoon percentages.</span></div>
       </article>
 
-      <section className="reproduction-panel surface surface-pad">
+      <details className="method-details"><summary>How this was calculated</summary><div className="method-details-content"><section className="reproduction-panel surface surface-pad">
         <div><div className="eyebrow">Reproduce the chart modules</div><h3 className="surface-title">Run from the repository root</h3><p className="surface-subtitle">The extraction commands validate the GLDAS CSVs and existing CSV/XLSX series.</p></div>
         <div className="code-steps"><code><span>1</span> python -m pip install -r requirements-extraction.txt</code><code><span>2</span> npm run data:extract</code><code><span>3</span> npm run data:check</code></div>
-      </section>
+      </section></div></details>
 
       <ScientificCaveat significanceNotAssessed={false}>GLDAS, ORAS5, MODIS Aqua absolute SST and annual September baseline means have documented trend tests. The two-month CPC Niño-3.4 anomaly series and the one-season monsoon percentages are not tested for significance for the reasons shown above.</ScientificCaveat>
     </section>

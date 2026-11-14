@@ -3,6 +3,7 @@ import "../monsoon.css";
 import { CalendarDays, CloudRain, MapPinned } from "lucide-react";
 import { ScientificBarChart } from "../components/ScientificBarChart";
 import { ScientificCaveat } from "../components/ScientificCaveat";
+import { PageFinding, PageSummary } from "../components/PageFinding";
 import { monsoon2026 } from "../data/realData";
 
 const monthlyRainfall = [
@@ -15,6 +16,8 @@ const monthlyRainfall = [
 export function IndiaMonsoonPage() {
   return (
     <section className="page-section monsoon-page">
+      <PageSummary>View the all-India June–September 2026 rainfall total and four reported monthly percentages of the Long Period Average.</PageSummary>
+      <PageFinding value={`${monsoon2026.percentOfLPA}%`} result="Seasonal rainfall below LPA" meaning={`${monsoon2026.rainfallMm} mm was reported against the ${monsoon2026.lpaMm} mm 1971–2020 LPA; this is a single-season summary.`} />
       <div className="page-intro">
         <div><div className="eyebrow">Seasonal rainfall · India</div><h2>Southwest monsoon 2026</h2><p>All-India seasonal rainfall and monthly percentages of the Long Period Average, as reported by the India Meteorological Department.</p></div>
         <span className="period-chip mono">JUN–SEP 2026</span>
