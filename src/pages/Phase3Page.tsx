@@ -1,128 +1,48 @@
-import React from "react";
-import { phase3Data } from "../data/realData";
+import "../phase3.css";
+import "../phase3.css";
+import { ArrowUpRight, BookOpen, GraduationCap, ShieldCheck } from "lucide-react";
 import { ScientificCaveat } from "../components/ScientificCaveat";
+import { phase3Data } from "../data/phase3Data";
 
-export const Phase3Page: React.FC = () => {
+export function Phase3Page() {
+  const impact = phase3Data.historicalStats.cseJanSep2026;
   return (
-    <section>
-      <h2 style={{ fontSize: "24px", color: "#f3f4f6", margin: "0 0 16px 0" }}>
-        Phase 3: Disaster Resilience Education — Prepared. Not Panicked.
-      </h2>
-
-      {/* Scope definition */}
-      <div style={{ background: "#111827", padding: "20px", borderRadius: "12px", border: "1px solid #1f2937", marginBottom: "20px" }}>
-        <h3 style={{ margin: "0 0 12px 0", color: "#34d399", fontSize: "18px" }}>
-          Programme Mission & Non-Predictive Mandate
-        </h3>
-        <p style={{ color: "#d1d5db", lineHeight: 1.6 }}>
-          Phase 3 is an <b>educational preparedness curriculum</b> tailored for school and college students across India. It is <b>NOT</b> a predictive forecasting tool: it generates no synthetic hazard probabilities, no automated panic alerts, and no unverified safety instructions. Its core focus is instilling verified situational literacy before extreme weather strikes.
-        </p>
+    <section className="page-section phase3-page">
+      <div className="prepared-banner">
+        <div className="prepared-symbol"><ShieldCheck size={27} /></div>
+        <div><div className="eyebrow">Phase 3 · educational preparedness</div><h2>Prepared. Not panicked.</h2><p>{phase3Data.scope}</p></div>
+        <span className="prepared-status">NOT A FORECAST</span>
       </div>
 
-      {/* Official Guidance First */}
-      <div style={{ background: "#111827", padding: "20px", borderRadius: "12px", border: "1px solid #1f2937", marginBottom: "20px" }}>
-        <h3 style={{ margin: "0 0 12px 0", color: "#60a5fa", fontSize: "18px" }}>
-          Official Direct Guidance Gateways
-        </h3>
-        <p style={{ color: "#9ca3af", fontSize: "14px", marginBottom: "14px" }}>
-          In any extreme meteorological event, official emergency directives from statutory bodies take absolute precedence:
-        </p>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "12px" }}>
-          {phase3Data.officialGuidance.map((org, idx) => (
-            <a
-              key={idx}
-              href={org.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: "block",
-                background: "#1f2937",
-                padding: "16px",
-                borderRadius: "8px",
-                border: "1px solid #374151",
-                textDecoration: "none",
-                color: "#93c5fd",
-                fontWeight: 600,
-                transition: "border-color 0.2s ease",
-              }}
-            >
-              <div style={{ fontSize: "15px" }}>{org.name} →</div>
-              <div style={{ fontSize: "12px", color: "#9ca3af", marginTop: "4px" }}>{org.url}</div>
-            </a>
-          ))}
+      <section className="official-guidance surface surface-pad">
+        <div className="guidance-heading"><div><div className="eyebrow">Start with official sources</div><h3 className="surface-title">Guidance gateways</h3><p className="surface-subtitle">Follow current directions from the relevant official body.</p></div><div className="prepared-icon"><BookOpen size={18} /></div></div>
+        <div className="guidance-links">
+          {phase3Data.officialGuidance.map((org) => <a key={org.name} href={org.url} target="_blank" rel="noreferrer noopener"><span>{org.name}</span><ArrowUpRight size={15} /></a>)}
         </div>
-      </div>
+      </section>
 
-      {/* Historical Disaster Realities (CSE Jan-Sep 2026) */}
-      <div style={{ background: "#111827", padding: "20px", borderRadius: "12px", border: "1px solid #1f2937", marginBottom: "20px" }}>
-        <h3 style={{ margin: "0 0 12px 0", color: "#f87171", fontSize: "18px" }}>
-          Historical Impact Statistics (Jan–Sep 2026)
-        </h3>
-        <p style={{ color: "#d1d5db", fontSize: "14px", marginBottom: "14px" }}>
-          Documented empirical context from the Centre for Science and Environment (CSE) State of India's Environment Report (1 Jan – 30 Sep 2026):
-        </p>
+      <section className="learning-section">
+        <div className="learning-heading"><div><div className="eyebrow">Learning path</div><h3>Five pillars of preparedness literacy</h3></div><span className="learning-audience"><GraduationCap size={14} />Schools and colleges in India</span></div>
+        <ol className="learning-list">
+          {phase3Data.modules.map((module, index) => <li key={module.title}><span className="learning-number">{String(index + 1).padStart(2, "0")}</span><div><strong>{module.title}</strong><p>{module.desc}</p></div><span className="learning-arrow">↗</span></li>)}
+        </ol>
+      </section>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px", marginBottom: "16px" }}>
-          <div style={{ background: "#1f2937", padding: "14px", borderRadius: "8px" }}>
-            <div style={{ fontSize: "12px", color: "#9ca3af" }}>Extreme Weather Days</div>
-            <div style={{ fontSize: "22px", fontWeight: "bold", color: "#f87171" }}>251 of 273 days</div>
-            <div style={{ fontSize: "12px", color: "#9ca3af", marginTop: "4px" }}>Jan–Sep 2026 record</div>
-          </div>
-          <div style={{ background: "#1f2937", padding: "14px", borderRadius: "8px" }}>
-            <div style={{ fontSize: "12px", color: "#9ca3af" }}>Lives Lost</div>
-            <div style={{ fontSize: "22px", fontWeight: "bold", color: "#ef4444" }}>3,220 deaths</div>
-            <div style={{ fontSize: "12px", color: "#9ca3af", marginTop: "4px" }}>Documented human toll</div>
-          </div>
-          <div style={{ background: "#1f2937", padding: "14px", borderRadius: "8px" }}>
-            <div style={{ fontSize: "12px", color: "#9ca3af" }}>Houses Damaged</div>
-            <div style={{ fontSize: "22px", fontWeight: "bold", color: "#fbbf24" }}>128,334 houses</div>
-            <div style={{ fontSize: "12px", color: "#9ca3af", marginTop: "4px" }}>Structural destruction</div>
-          </div>
+      <section className="impact-section surface surface-pad">
+        <div className="eyebrow">Historical retrospective · not a forecast</div>
+        <h3 className="surface-title">Reported impacts, January–September 2026</h3>
+        <p className="surface-subtitle">{impact.source} · period: {impact.period}</p>
+        <div className="impact-strip">
+          <div><span>Extreme weather days</span><strong>{impact.extremeWeatherDays}</strong></div>
+          <div><span>Deaths reported</span><strong>{impact.deaths.toLocaleString("en-IN")}</strong></div>
+          <div><span>Houses damaged</span><strong>{impact.housesDamaged.toLocaleString("en-IN")}</strong></div>
         </div>
+        <div className="cyclone-context"><strong>Named event records in the project notes</strong><ul>{phase3Data.historicalStats.cyclones.map((cyclone) => <li key={cyclone.name}><span>{cyclone.name}</span><span>{cyclone.impact}</span></li>)}</ul></div>
+      </section>
 
-        <div style={{ background: "#1f2937", padding: "14px", borderRadius: "8px", fontSize: "13px", color: "#e5e7eb", lineHeight: 1.6 }}>
-          <b>Verified Cyclone Casualty Records:</b>
-          <ul style={{ margin: "6px 0 0 0", paddingLeft: "20px" }}>
-            <li><b>Cyclone Arnab:</b> 9 deaths in Andhra Pradesh, 26+ total casualties.</li>
-            <li><b>Cyclone Murasu:</b> 17+ deaths, ≥$203M estimated damage, landfall 2–3 November 2026 near Ongole.</li>
-          </ul>
-          <div style={{ color: "#9ca3af", marginTop: "6px", fontSize: "12px" }}>
-            *Presented as historical retrospective statistics only, not a forward hazard probability model.
-          </div>
-        </div>
-      </div>
-
-      {/* Five Educational Modules */}
-      <div style={{ background: "#111827", padding: "20px", borderRadius: "12px", border: "1px solid #1f2937", marginBottom: "20px" }}>
-        <h3 style={{ margin: "0 0 12px 0", color: "#fbbf24", fontSize: "18px" }}>
-          Five Pillars of Educational Resilience
-        </h3>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "12px" }}>
-          {phase3Data.modules.map((m, idx) => (
-            <div key={idx} style={{ background: "#1f2937", padding: "16px", borderRadius: "8px", borderTop: "3px solid #fbbf24" }}>
-              <div style={{ fontWeight: "bold", color: "#fef08a", fontSize: "15px", marginBottom: "6px" }}>
-                {idx + 1}. {m.title}
-              </div>
-              <div style={{ color: "#d1d5db", fontSize: "13px", lineHeight: 1.5 }}>{m.desc}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Video Resource Guidance */}
-      <div style={{ background: "#111827", padding: "20px", borderRadius: "12px", border: "1px solid #1f2937" }}>
-        <h3 style={{ margin: "0 0 8px 0", color: "#a78bfa", fontSize: "16px" }}>
-          🎥 Training Video Deployment
-        </h3>
-        <p style={{ color: "#d1d5db", fontSize: "14px", lineHeight: 1.6 }}>
-          {phase3Data.videoNote}
-        </p>
-      </div>
-
-      <ScientificCaveat significanceNotAssessed={true}>
-        Significance not assessed: Historical statistics are empirical records from government and institutional reviews. Phase 3 provides safety education, not hazard prediction.
-      </ScientificCaveat>
+      <section className="video-note surface surface-pad"><div className="prepared-icon"><BookOpen size={18} /></div><div><div className="eyebrow">Training resource</div><p>{phase3Data.videoNote}</p></div></section>
+      <ScientificCaveat>Phase 3 provides educational preparedness context only. It does not generate hazard probabilities, forecasts, or emergency alerts.</ScientificCaveat>
     </section>
   );
-};
+}
+

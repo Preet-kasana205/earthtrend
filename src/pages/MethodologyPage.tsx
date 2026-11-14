@@ -1,97 +1,71 @@
-import React from "react";
+import "../methodology.css";
+import { Check, ClipboardCheck, Database, ShieldAlert } from "lucide-react";
 import { ScientificCaveat } from "../components/ScientificCaveat";
+import { thermocline } from "../data/realData";
 
-export const MethodologyPage: React.FC = () => {
+const checks = [
+  "Exactly 815 monthly observations",
+  "Continuous monthly dates from Jan 1958 through Nov 2025",
+  "No duplicate dates or missing month records",
+  "Finite numeric source values in every row",
+  "Single location: 0°N, 110°W",
+];
+
+export function MethodologyPage() {
   return (
-    <section>
-      <h2 style={{ fontSize: "24px", color: "#f3f4f6", margin: "0 0 16px 0" }}>
-        Scientific Methodology & Computational Verification
-      </h2>
+    <section className="page-section methodology-page">
+      <div className="page-intro">
+        <div><div className="eyebrow">Reproducibility · caveats · definitions</div><h2>How the numbers are made</h2><p>Calculations below are deterministic summaries of the preserved observations. Each comparison keeps its source period and variable definition.</p></div>
+      </div>
 
-      {/* 1. Rainfall Derivation & Calculation */}
-      <div style={{ background: "#111827", padding: "20px", borderRadius: "12px", border: "1px solid #1f2937", marginBottom: "20px" }}>
-        <h3 style={{ margin: "0 0 12px 0", color: "#60a5fa", fontSize: "18px" }}>
-          1. Pacific Rainfall: Mathematical Derivation & Spatial Consistency
-        </h3>
-        <p style={{ color: "#d1d5db", lineHeight: 1.6, marginBottom: "12px" }}>
-          The September 2026 Pacific rainfall anomaly is derived from NASA Giovanni area-averaged daily precipitation estimates. Both the target month and the historical baseline maintain identical spatial, temporal, and algorithmic constraints:
-        </p>
-
-        <ul style={{ color: "#d1d5db", fontSize: "14px", lineHeight: 1.8, marginBottom: "16px" }}>
-          <li><b>Variable:</b> <code>GPM_3IMERGDL_07_precipitation</code> (Daily mean precipitation rate, combined microwave-IR estimate).</li>
-          <li><b>Spatial Bounding Box:</b> Exactly 170°W–120°W, 5°S–5°N (Data bounding box: -169.95°, -4.95°, -120.05°, 4.95°).</li>
-          <li><b>Spatial Averaging:</b> Area-weighted arithmetic grid mean across the bounding box.</li>
-          <li><b>Units:</b> Millimetres per day (mm/day).</li>
-        </ul>
-
-        <div style={{ background: "#1f2937", padding: "16px", borderRadius: "8px", fontFamily: "monospace", fontSize: "13px", color: "#e5e7eb", lineHeight: 1.6 }}>
-          <div style={{ color: "#93c5fd", fontWeight: "bold", marginBottom: "8px" }}>// Computational Formula & Execution Audit</div>
-          <div>1. September 2026 Observation Total:</div>
-          <div>   n = 30 days (1–30 September 2026)</div>
-          <div>   Σ P_i = 132.9762 mm</div>
-          <div>   Daily Mean = 132.9762 / 30 = 4.43254 mm/day → Displayed as <b>4.43 mm/day</b></div>
-          <br />
-          <div>2. Climatological Baseline Total (Septembers 2001–2019):</div>
-          <div>   n = 19 years × 30 days = 570 daily observations</div>
-          <div>   Σ P_base = 383.7893 mm</div>
-          <div>   Baseline Mean = 383.7893 / 570 = 0.67331 mm/day → Displayed as <b>0.67 mm/day</b></div>
-          <br />
-          <div>3. Observational Anomaly Departure:</div>
-          <div>   Anomaly = 4.43254 - 0.67331 = +3.75923 mm/day → Displayed as <b>+3.76 mm/day</b></div>
+      <article className="method-chapter surface surface-pad">
+        <div className="chapter-kicker"><span>01</span><div className="eyebrow">Pacific rainfall calculation</div></div>
+        <h3>September 2026 against the September climatological sample</h3>
+        <p className="method-lead">The rainfall anomaly compares the NASA Giovanni daily area-averaged precipitation rate for 1–30 September 2026 with the mean of September daily observations from 2001–2019. Both series use the same Niño-3.4 bounding box.</p>
+        <div className="method-definition-grid">
+          <div><span>Variable</span><strong>GPM_3IMERGDL_07 precipitation</strong></div>
+          <div><span>Region</span><strong>170°W–120°W · 5°S–5°N</strong></div>
+          <div><span>Unit</span><strong>mm/day</strong></div>
+          <div><span>Baseline</span><strong>570 September daily observations · 2001–2019</strong></div>
         </div>
-      </div>
-
-      {/* 2. Scientific Protocols & Safeguards */}
-      <div style={{ background: "#111827", padding: "20px", borderRadius: "12px", border: "1px solid #1f2937", marginBottom: "20px" }}>
-        <h3 style={{ margin: "0 0 12px 0", color: "#fbbf24", fontSize: "18px" }}>
-          2. Mandatory Scientific Safeguards
-        </h3>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          <div style={{ background: "#1f2937", padding: "14px", borderRadius: "8px" }}>
-            <b style={{ color: "#f87171" }}>Niño-3.4 Monthly SST Anomalies vs ONI:</b>
-            <p style={{ margin: "4px 0 0 0", color: "#d1d5db", fontSize: "13px", lineHeight: 1.5 }}>
-              Values (+2.5°C Oct 2026, +2.1°C Sep 2026) are strictly labelled as <b>monthly Niño-3.4 SST anomalies</b> (ERSST v5, 1991–2020 base). They are <b>NOT</b> the Oceanic Niño Index (ONI), which requires a 3-month running mean. Weekly values are strictly segregated and never presented as headline anomalies.
-            </p>
-          </div>
-
-          <div style={{ background: "#1f2937", padding: "14px", borderRadius: "8px" }}>
-            <b style={{ color: "#38bdf8" }}>ORAS5 Thermocline Depth & Unconfirmed Units:</b>
-            <p style={{ margin: "4px 0 0 0", color: "#d1d5db", fontSize: "13px", lineHeight: 1.5 }}>
-              The ORAS5 time series represents the depth of the 20°C isotherm at a single point (0°N, 110°W) from Jan 1958 to Nov 2025. Because the file header explicitly states <code>source value; confirm units</code>, its chart axis is strictly displayed as <b>"Unit unconfirmed"</b>, rather than assuming metres without primary documentation.
-            </p>
-          </div>
-
-          <div style={{ background: "#1f2937", padding: "14px", borderRadius: "8px" }}>
-            <b style={{ color: "#a78bfa" }}>Physical Separation of Subsurface Thermal Anomalies:</b>
-            <p style={{ margin: "4px 0 0 0", color: "#d1d5db", fontSize: "13px", lineHeight: 1.5 }}>
-              NOAA CPC's October 2026 subsurface temperature anomalies (&gt;+10°C at depth, +3.32°C upper 300m) measure temperature departures, NOT isotherm depth. They are presented in an isolated contextual box and are <b>NEVER appended</b> to the ORAS5 depth series.
-            </p>
-          </div>
-
-          <div style={{ background: "#1f2937", padding: "14px", borderRadius: "8px" }}>
-            <b style={{ color: "#34d399" }}>Multi-Agency Independence (BoM vs IMD):</b>
-            <p style={{ margin: "4px 0 0 0", color: "#d1d5db", fontSize: "13px", lineHeight: 1.5 }}>
-              BoM's positive IOD declaration (+0.75°C, week to 8 Nov 2026) and IMD's neutral diagnosis (31 Oct 2026) are displayed side-by-side. Different operational thresholds and assessment dates explain the variation; neither agency is deemed erroneous.
-            </p>
-          </div>
+        <div className="formula-block" aria-label="Pacific rainfall calculation">
+          <div className="formula-heading"><ClipboardCheck size={15} />Reproducible calculation</div>
+          <div className="formula-line"><span>September 2026</span><code>30 daily observations · Σ = 132.9762 mm</code></div>
+          <div className="formula-line"><span>Observed daily mean</span><code>132.9762 ÷ 30 = 4.4325 mm/day</code></div>
+          <div className="formula-line"><span>September baseline mean</span><code>383.7893 ÷ 570 = 0.6733 mm/day</code></div>
+          <div className="formula-line formula-result"><span>Mean departure</span><code>4.4325 − 0.6733 = +3.7592 mm/day</code></div>
         </div>
-      </div>
+        <div className="method-source"><Database size={14} /><span>Raw source files: NASA Giovanni September 2026 CSV and 2001–2020 CSV in <code>src/data/raw/</code>. The baseline calculation uses only September dates in 2001–2019.</span></div>
+      </article>
 
-      {/* 3. Space Apps Project Context & AI Disclosure */}
-      <div style={{ background: "#111827", padding: "20px", borderRadius: "12px", border: "1px solid #1f2937" }}>
-        <h3 style={{ margin: "0 0 8px 0", color: "#f3f4f6", fontSize: "16px" }}>
-          Project Context & AI Tooling Disclosure
-        </h3>
-        <p style={{ color: "#d1d5db", fontSize: "14px", lineHeight: 1.6 }}>
-          <b>Event:</b> Built during NASA Space Apps Challenge, 14–15 November 2026.<br />
-          <b>AI Development Tools Used:</b> Muse, Google AI Studio, Codex (free), Antigravity. All codebase logic and verification routines were authored, independently validated, and regenerated during 14–15 November 2026.
-        </p>
-      </div>
+      <article className="method-chapter surface surface-pad">
+        <div className="chapter-kicker"><span>02</span><div className="eyebrow">ORAS5 data quality</div></div>
+        <h3>Historical source values, one location, units unconfirmed</h3>
+        <p className="method-lead">The chart series is extracted from the workbook’s “Monthly Data” worksheet. The source field is named “Depth of 20C isotherm (source value; confirm units)”. Its measurement units have not been confirmed, so the chart displays source values without calling them metres.</p>
+        <div className="quality-grid"><div className="quality-count"><strong>815</strong><span>monthly rows</span></div><div className="quality-period"><span className="mono">JAN 1958 — NOV 2025</span><span>{thermocline.location}</span></div></div>
+        <ul className="quality-check-list">{checks.map((check) => <li key={check}><Check size={14} />{check}</li>)}</ul>
+        <div className="method-source"><Database size={14} /><span>Original source: <code>src/data/raw/ORAS5_Thermocline_Cleaned_1958_2025_No_Readme.xlsx</code>. No 2026 ORAS5 values are added.</span></div>
+      </article>
 
-      <ScientificCaveat significanceNotAssessed={true}>
-        Significance not assessed: Scientific derivations reflect deterministic data processing against operational baselines.
-      </ScientificCaveat>
+      <article className="method-chapter safeguard-chapter surface-raised surface-pad">
+        <div className="chapter-kicker"><span>03</span><div className="eyebrow">Interpretation safeguards</div></div>
+        <h3>Keep labels tied to the underlying variable</h3>
+        <div className="safeguard-list">
+          <div><span className="safeguard-marker">A</span><div><strong>Monthly Niño-3.4 anomaly is not ONI</strong><p>Monthly SST anomaly values are labelled as monthly Niño-3.4 anomalies. ONI is a three-month running index.</p></div></div>
+          <div><span className="safeguard-marker">B</span><div><strong>Subsurface temperature and thermocline depth stay separate</strong><p>The NOAA CPC October 2026 temperature anomaly summary is contextual information and is never appended to the historical ORAS5 isotherm-depth series.</p></div></div>
+          <div><span className="safeguard-marker">C</span><div><strong>Sea-surface height is pattern-only</strong><p>No centimetre chart, contour map, or synthetic field is generated for SSH.</p></div></div>
+          <div><span className="safeguard-marker">D</span><div><strong>Phase 3 is preparedness education</strong><p>The module provides educational context and official guidance links. It does not predict hazards or issue warnings.</p></div></div>
+        </div>
+        <div className="method-source"><ShieldAlert size={14} /><span>No statistical significance test is documented for these observations.</span></div>
+      </article>
+
+      <section className="reproduction-panel surface surface-pad">
+        <div><div className="eyebrow">Reproduce the chart modules</div><h3 className="surface-title">Run from the repository root</h3><p className="surface-subtitle">Python extraction requires the pinned openpyxl package listed in <code>requirements-extraction.txt</code>.</p></div>
+        <div className="code-steps"><code><span>1</span> python -m pip install -r requirements-extraction.txt</code><code><span>2</span> python scripts/extractChartData.py</code><code><span>3</span> python scripts/extractChartData.py --check</code></div>
+      </section>
+
+      <ScientificCaveat>Significance not assessed. Reproducible data extraction and descriptive arithmetic do not constitute a statistical test.</ScientificCaveat>
     </section>
   );
-};
+}
+

@@ -1,92 +1,98 @@
-import { useState } from "react";
-import { OverviewPage } from "./pages/OverviewPage";
-import { TrendExplorerPage } from "./pages/TrendExplorerPage";
-import { RelationshipsPage } from "./pages/RelationshipsPage";
-import { IndiaMonsoonPage } from "./pages/IndiaMonsoonPage";
-import { DatasetsPage } from "./pages/DatasetsPage";
-import { MethodologyPage } from "./pages/MethodologyPage";
-import { Phase3Page } from "./pages/Phase3Page";
+import { lazy, Suspense, useState } from "react";
+import {
+  Activity,
+  BookOpenCheck,
+  CloudRain,
+  Database,
+  LayoutDashboard,
+  Menu,
+  Orbit,
+  PanelLeftClose,
+  PanelLeftOpen,
+  ShieldCheck,
+  X,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import "./App.css";
 
-type Page = "overview" | "trend" | "relationship" | "monsoon" | "datasets" | "methodology" | "phase3";
+type PageId = "overview" | "trend" | "relationships" | "monsoon" | "datasets" | "methodology" | "phase3";
+type NavItem = { id: PageId; label: string; badge: string; icon: LucideIcon };
 
-const pages: { id: Page; label: string }[] = [
-  { id: "overview", label: "Overview" },
-  { id: "trend", label: "Trend Explorer" },
-  { id: "relationship", label: "Relationships" },
-  { id: "monsoon", label: "India Monsoon" },
-  { id: "datasets", label: "Datasets" },
-  { id: "methodology", label: "Methodology" },
-  { id: "phase3", label: "Phase 3: Preparedness" },
+const OverviewPage = lazy(() => import("./pages/OverviewPage").then((module) => ({ default: module.OverviewPage })));
+const TrendExplorerPage = lazy(() => import("./pages/TrendExplorerPage").then((module) => ({ default: module.TrendExplorerPage })));
+const RelationshipsPage = lazy(() => import("./pages/RelationshipsPage").then((module) => ({ default: module.RelationshipsPage })));
+const IndiaMonsoonPage = lazy(() => import("./pages/IndiaMonsoonPage").then((module) => ({ default: module.IndiaMonsoonPage })));
+const DatasetsPage = lazy(() => import("./pages/DatasetsPage").then((module) => ({ default: module.DatasetsPage })));
+const MethodologyPage = lazy(() => import("./pages/MethodologyPage").then((module) => ({ default: module.MethodologyPage })));
+const Phase3Page = lazy(() => import("./pages/Phase3Page").then((module) => ({ default: module.Phase3Page })));
+
+const pages: NavItem[] = [
+  { id: "overview", label: "Overview", badge: "01", icon: LayoutDashboard },
+  { id: "trend", label: "Trend Explorer", badge: "02", icon: Activity },
+  { id: "relationships", label: "Relationships", badge: "03", icon: Orbit },
+  { id: "monsoon", label: "India Monsoon", badge: "04", icon: CloudRain },
+  { id: "datasets", label: "Datasets", badge: "05", icon: Database },
+  { id: "methodology", label: "Methodology", badge: "06", icon: BookOpenCheck },
+  { id: "phase3", label: "Preparedness", badge: "07", icon: ShieldCheck },
 ];
 
 export default function App() {
-  const [page, setPage] = useState<Page>("overview");
+  const [page, setPage] = useState<PageId>("overview");
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const activePage = pages.find((item) => item.id === page) ?? pages[0];
+
+  const navigate = (nextPage: PageId) => {
+    setPage(nextPage);
+    setMobileMenuOpen(false);
+  };
 
   return (
-    <div style={{ fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", background: "#0b1220", color: "#e5e7eb", minHeight: "100vh", textAlign: "left" }}>
-      <header style={{ padding: "24px 32px", borderBottom: "1px solid #1f2937", background: "#0e1726" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
-            <h1 style={{ margin: 0, fontSize: "28px", color: "#f9fafb", fontWeight: 700 }}>
-              🌍 EarthTrend — Earth System Trend Detective
-            </h1>
-            <span style={{ fontSize: "12px", background: "rgba(37, 99, 235, 0.2)", border: "1px solid #2563eb", color: "#93c5fd", padding: "4px 10px", borderRadius: "9999px", fontWeight: 600 }}>
-              Verified 2026 Data Only
-            </span>
-          </div>
-          <p style={{ color: "#9ca3af", margin: "8px 0 0", fontSize: "14px" }}>
-            Built during NASA Space Apps Challenge, 14–15 Nov 2026. Real 2026 data only — source, period and caveats on every finding.
-          </p>
+    <div className={`app-shell ${collapsed ? "sidebar-collapsed" : ""} ${mobileMenuOpen ? "mobile-menu-open" : ""}`}>
+      <aside className="sidebar" aria-label="Primary navigation">
+        <div className="sidebar-brand">
+          <div className="brand-mark" aria-hidden="true">ET</div>
+          {!collapsed && <div className="brand-copy"><span>EARTH<span className="brand-accent">TREND</span></span><small>Climate signals, clearly.</small></div>}
+          <button className="icon-button sidebar-collapse" type="button" onClick={() => setCollapsed((value) => !value)} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} title={collapsed ? "Expand sidebar" : "Collapse sidebar"}>
+            {collapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
+          </button>
         </div>
-      </header>
-
-      {/* Primary Navigation */}
-      <nav style={{ background: "#0d1527", borderBottom: "1px solid #1f2937" }}>
-        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", padding: "14px 32px", maxWidth: 1100, margin: "0 auto" }}>
-          {pages.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => setPage(p.id)}
-              style={{
-                padding: "8px 16px",
-                borderRadius: "8px",
-                border: page === p.id ? "1px solid #3b82f6" : "1px solid #374151",
-                background: page === p.id ? "#2563eb" : "#111827",
-                color: page === p.id ? "#ffffff" : "#d1d5db",
-                fontWeight: page === p.id ? 600 : 500,
-                fontSize: "14px",
-                cursor: "pointer",
-                transition: "all 0.15s ease",
-              }}
-            >
-              {p.label}
+        <div className="sidebar-section-label">WORKSPACE</div>
+        <nav className="nav-list">
+          {pages.map(({ id, label, badge, icon: Icon }) => (
+            <button key={id} type="button" className={`nav-link ${page === id ? "active" : ""}`} onClick={() => navigate(id)} aria-current={page === id ? "page" : undefined} title={collapsed ? label : undefined}>
+              <Icon size={18} strokeWidth={1.8} aria-hidden="true" />
+              {!collapsed && <><span className="nav-label">{label}</span><span className="nav-badge">{badge}</span></>}
+              {collapsed && <span className="sr-only">{label}</span>}
             </button>
           ))}
-        </div>
-      </nav>
+        </nav>
+        <div className="sidebar-bottom"><span className="status-dot" aria-hidden="true" />{!collapsed && <span>Verified Source Data</span>}</div>
+      </aside>
+      {mobileMenuOpen && <button className="sidebar-scrim" type="button" aria-label="Close navigation" onClick={() => setMobileMenuOpen(false)} />}
 
-      {/* Main Page Body */}
-      <main style={{ padding: "24px 32px 48px", maxWidth: 1100, margin: "0 auto", boxSizing: "border-box" }}>
-        {page === "overview" && <OverviewPage />}
-        {page === "trend" && <TrendExplorerPage />}
-        {page === "relationship" && <RelationshipsPage />}
-        {page === "monsoon" && <IndiaMonsoonPage />}
-        {page === "datasets" && <DatasetsPage />}
-        {page === "methodology" && <MethodologyPage />}
-        {page === "phase3" && <Phase3Page />}
-      </main>
-
-      {/* Footer */}
-      <footer style={{ padding: "20px 32px", borderTop: "1px solid #1f2937", background: "#0e1726", color: "#9ca3af", fontSize: "13px" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
-          <span>
-            EarthTrend · NASA Space Apps 2026 · Built 14–15 Nov 2026
-          </span>
-          <span>
-            Sources: NOAA CPC, NASA Giovanni (GPM IMERG), BoM, IMD, ORAS5, NASA Sentinel-6
-          </span>
-        </div>
-      </footer>
+      <div className="main-panel">
+        <header className="topbar">
+          <div className="topbar-heading">
+            <button className="icon-button mobile-menu-button" type="button" onClick={() => setMobileMenuOpen((value) => !value)} aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}>{mobileMenuOpen ? <X size={19} /> : <Menu size={19} />}</button>
+            <div><div className="breadcrumb"><span>EarthTrend</span><span className="breadcrumb-separator">/</span><span>{activePage.label}</span></div><h1>{activePage.label}</h1></div>
+          </div>
+          <div className="topbar-status"><span className="status-dot" /><span>Verified Source Data</span></div>
+        </header>
+        <main className="page-main mx-auto w-full max-w-7xl px-4 pb-10 pt-6 sm:px-6 lg:px-8">
+          <Suspense fallback={<div className="surface surface-pad page-loading">Loading page…</div>}>
+            {page === "overview" && <OverviewPage onNavigate={navigate} />}
+            {page === "trend" && <TrendExplorerPage />}
+            {page === "relationships" && <RelationshipsPage onNavigate={() => navigate("methodology")} />}
+            {page === "monsoon" && <IndiaMonsoonPage />}
+            {page === "datasets" && <DatasetsPage />}
+            {page === "methodology" && <MethodologyPage />}
+            {page === "phase3" && <Phase3Page />}
+          </Suspense>
+        </main>
+        <footer className="site-footer"><div className="footer-inner mx-auto flex w-full max-w-7xl flex-col gap-2 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8"><span>EarthTrend · NASA Space Apps Challenge · 14–15 November 2026</span><span>Sources: NOAA CPC · NASA Giovanni · IMD · BoM · ECMWF ORAS5</span></div></footer>
+      </div>
     </div>
   );
 }
+

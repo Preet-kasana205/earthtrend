@@ -1,0 +1,43 @@
+.methodology-page { gap:16px; }
+.method-chapter { display:grid; gap:12px; }
+.chapter-kicker { display:flex; align-items:center; gap:10px; }
+.chapter-kicker > span { display:grid; place-items:center; width:25px; height:25px; border:1px solid #29445f; border-radius:7px; background:#122439; color:#70d4df; font:600 9px var(--mono); }
+.method-chapter h3 { margin:0; color:#e8f0fb; font-size:17px; font-weight:600; letter-spacing:-.025em; }
+.method-lead { max-width:920px; margin:0; color:#9aacc1; font-size:11px; line-height:1.75; }
+.method-definition-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:9px; margin:5px 0; }
+.method-definition-grid div { display:grid; gap:6px; padding:11px; border:1px solid #233750; border-radius:9px; background:#0d1928; }
+.method-definition-grid span { color:#6f849d; font:500 8px var(--mono); text-transform:uppercase; letter-spacing:.08em; }
+.method-definition-grid strong { color:#cad7e6; font-size:9px; font-weight:500; line-height:1.5; }
+.formula-block { display:grid; gap:0; padding:15px; border:1px solid #29435e; border-radius:11px; background:#0b1726; }
+.formula-heading { display:flex; align-items:center; gap:8px; margin-bottom:8px; color:#65ceda; font:600 9px var(--mono); text-transform:uppercase; letter-spacing:.08em; }
+.formula-line { display:flex; justify-content:space-between; gap:20px; padding:8px 0; border-top:1px solid #1c2c41; }
+.formula-line span { color:#8da0b8; font-size:9px; }
+.formula-line code { color:#c5d6e8; font:500 9px var(--mono); text-align:right; }
+.formula-result { margin-top:3px; border-color:#285550; }
+.formula-result code { color:#82eee0; }
+.method-source { display:flex; align-items:flex-start; gap:8px; color:#8197af; font-size:9px; line-height:1.6; }
+.method-source svg { flex:0 0 auto; margin-top:1px; color:#59c6d4; }
+.method-source code { color:#a7c8d0; font:500 8px var(--mono); overflow-wrap:anywhere; }
+.quality-grid { display:flex; align-items:center; gap:18px; padding:13px; border:1px solid #263d57; border-radius:10px; background:#0d1a29; }
+.quality-count { display:grid; justify-items:center; min-width:80px; }
+.quality-count strong { color:#a0f1e3; font:700 31px var(--mono); letter-spacing:-.08em; }
+.quality-count span { color:#6f879d; font:500 8px var(--mono); text-transform:uppercase; }
+.quality-period { display:grid; gap:6px; padding-left:18px; border-left:1px solid #294159; color:#8da1b9; font-size:9px; }
+.quality-period .mono { color:#d1deeb; font-size:9px; }
+.quality-check-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px 14px; margin:0; padding:0; list-style:none; }
+.quality-check-list li { display:flex; align-items:center; gap:7px; color:#a5b6c8; font-size:9px; }
+.quality-check-list svg { flex:0 0 auto; color:#49cfac; }
+.safeguard-chapter { border-color:#28505d; background:linear-gradient(135deg,#102635,#102130); }
+.safeguard-list { display:grid; gap:0; }
+.safeguard-list > div { display:flex; gap:11px; padding:13px 0; border-top:1px solid #274154; }
+.safeguard-marker { display:grid; place-items:center; flex:0 0 23px; width:23px; height:23px; border:1px solid #316073; border-radius:7px; color:#71d5df; font:600 8px var(--mono); }
+.safeguard-list strong { color:#d4e3f1; font-size:10px; }
+.safeguard-list p { margin:4px 0 0; color:#92a6bb; font-size:9px; line-height:1.6; }
+.reproduction-panel { display:grid; grid-template-columns:1fr minmax(280px,.8fr); align-items:center; gap:22px; }
+.reproduction-panel h3 { margin-top:5px; }
+.reproduction-panel .surface-subtitle code { color:#9acbd3; font:500 8px var(--mono); }
+.code-steps { display:grid; gap:7px; }
+.code-steps code { display:flex; align-items:center; gap:9px; padding:9px 10px; border:1px solid #263c55; border-radius:7px; background:#0b1725; color:#bed4e0; font:500 8px var(--mono); overflow-wrap:anywhere; }
+.code-steps span { color:#4ec4d4; }
+@media(max-width:750px) { .method-definition-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .reproduction-panel { grid-template-columns:1fr; } }
+@media(max-width:520px) { .formula-line { flex-direction:column; gap:5px; } .formula-line code { text-align:left; } .quality-check-list { grid-template-columns:1fr; } }
