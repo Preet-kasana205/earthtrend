@@ -15,6 +15,17 @@ interface InteractiveOverviewMapProps {
   onNavigate: (selection: TrendSelection) => void;
 }
 
+function focusRegion(
+  map: L.Map,
+  region: OverviewMapRegion,
+  rectangleRefs: MutableRefObject<Partial<Record<RegionName, L.Rectangle | null>>>,
+  onSelect: (name: RegionName) => void,
+) {
+  onSelect(region.name);
+  map.fitBounds(region.bounds, { padding: [36, 36], maxZoom: region.name === "Niño-3.4" ? 4 : 6, animate: false });
+  rectangleRefs.current[region.name]?.openPopup();
+}
+
 function MapFallback() {
   return (
     <div className="map-fallback-stack">
@@ -52,12 +63,6 @@ function RegionControls({
 }) {
   const map = useMap();
 
-  const openRegion = (region: OverviewMapRegion) => {
-    onSelect(region.name);
-    map.fitBounds(region.bounds, { padding: [36, 36], maxZoom: region.name === "Niño-3.4" ? 4 : 6, animate: false });
-    rectangleRefs.current[region.name]?.openPopup();
-  };
-
   return (
     <div className="map-region-controls" aria-label="Select a mapped region">
       {overviewMapRegions.map((region) => (
@@ -66,7 +71,7 @@ function RegionControls({
           type="button"
           aria-pressed={selectedRegion === region.name}
           className={selectedRegion === region.name ? "is-selected" : ""}
-          onClick={() => openRegion(region)}
+          onClick={() => focusRegion(map, region, rectangleRefs, onSelect)}
         >
           {region.name}
         </button>
@@ -75,13 +80,56 @@ function RegionControls({
   );
 }
 
+function RegionShapes({
+  findings,
+  onNavigate,
+  selectedRegion,
+  rectangleRefs,
+  onSelect,
+}: InteractiveOverviewMapProps & {
+  selectedRegion: RegionName | null;
+  rectangleRefs: MutableRefObject<Partial<Record<RegionName, L.Rectangle | null>>>;
+  onSelect: (name: RegionName) => void;
+}) {
+  const map = useMap();
+
+  return <>
+    {overviewMapRegions.map((region) => (
+      <Rectangle
+        key={region.name}
+        ref={(layer) => { rectangleRefs.current[region.name] = layer; }}
+        bounds={region.bounds}
+        pathOptions={{
+          color: "#06b6d4",
+          weight: selectedRegion === region.name ? 2 : 1.25,
+          opacity: selectedRegion === region.name ? 1 : 0.82,
+          fillColor: "#14b8a6",
+          fillOpacity: selectedRegion === region.name ? 0.2 : 0.08,
+        }}
+        eventHandlers={{ click: () => focusRegion(map, region, rectangleRefs, onSelect) }}
+      >
+        <Popup className="overview-map-popup" maxWidth={300}>
+          <div className="overview-map-popup-content">
+            <strong>{region.name}</strong>
+            <p>{findings[region.name]}</p>
+            {region.name !== "Niño-3.4" && <small>Seasonality and serial autocorrelation are not adjusted.</small>}
+            <button type="button" className="map-popup-button" onClick={() => onNavigate(region.selection)}>
+              View in Trend Explorer
+            </button>
+          </div>
+        </Popup>
+      </Rectangle>
+    ))}
+  </>;
+}
+
 function FitAllRegions() {
   const map = useMap();
 
   useEffect(() => {
     const bounds = L.latLngBounds(overviewMapRegions[0].bounds);
     overviewMapRegions.slice(1).forEach((region) => bounds.extend(region.bounds));
-    map.fitBounds(bounds, { padding: [24, 24], maxZoom: 3, animate: false });
+    map.fitBounds(bounds, { padding: [24, 24], maxZoom: 1, animate: false });
   }, [map]);
 
   return null;
@@ -103,9 +151,9 @@ function InteractiveMap({ findings, onNavigate }: InteractiveOverviewMapProps) {
       <div className="map-canvas interactive-map-canvas">
         <MapContainer
           className="interactive-leaflet-map"
-          center={[15, -35]}
-          zoom={2}
-          minZoom={1}
+          center={[15, -37]}
+          zoom={0}
+          minZoom={0}
           maxZoom={8}
           scrollWheelZoom={false}
           zoomControl
@@ -118,32 +166,13 @@ function InteractiveMap({ findings, onNavigate }: InteractiveOverviewMapProps) {
           />
           <TileErrorMonitor onError={() => setTileFailed(true)} />
           <FitAllRegions />
-          {overviewMapRegions.map((region) => (
-            <Rectangle
-              key={region.name}
-              ref={(layer) => { rectangleRefs.current[region.name] = layer; }}
-              bounds={region.bounds}
-              pathOptions={{
-                color: "#06b6d4",
-                weight: selectedRegion === region.name ? 2 : 1.25,
-                opacity: selectedRegion === region.name ? 1 : 0.82,
-                fillColor: "#14b8a6",
-                fillOpacity: selectedRegion === region.name ? 0.2 : 0.08,
-              }}
-              eventHandlers={{ click: () => setSelectedRegion(region.name) }}
-            >
-              <Popup className="overview-map-popup" maxWidth={300}>
-                <div className="overview-map-popup-content">
-                  <strong>{region.name}</strong>
-                  <p>{findings[region.name]}</p>
-                  {region.name !== "Niño-3.4" && <small>Seasonality and serial autocorrelation are not adjusted.</small>}
-                  <button type="button" className="map-popup-button" onClick={() => onNavigate(region.selection)}>
-                    View in Trend Explorer
-                  </button>
-                </div>
-              </Popup>
-            </Rectangle>
-          ))}
+          <RegionShapes
+            findings={findings}
+            onNavigate={onNavigate}
+            selectedRegion={selectedRegion}
+            rectangleRefs={rectangleRefs}
+            onSelect={setSelectedRegion}
+          />
           <RegionControls selectedRegion={selectedRegion} rectangleRefs={rectangleRefs} onSelect={setSelectedRegion} />
         </MapContainer>
       </div>
