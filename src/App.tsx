@@ -13,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import type { TrendSelection } from "./lib/overviewMapRegions.js";
 import "./App.css";
 
 type PageId = "overview" | "trend" | "relationships" | "monsoon" | "datasets" | "methodology" | "phase3";
@@ -38,11 +39,13 @@ const pages: NavItem[] = [
 
 export default function App() {
   const [page, setPage] = useState<PageId>("overview");
+  const [trendSelection, setTrendSelection] = useState<TrendSelection | undefined>();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const activePage = pages.find((item) => item.id === page) ?? pages[0];
 
-  const navigate = (nextPage: PageId) => {
+  const navigate = (nextPage: PageId, selection?: TrendSelection) => {
+    if (nextPage === "trend") setTrendSelection(selection);
     setPage(nextPage);
     setMobileMenuOpen(false);
   };
@@ -82,7 +85,7 @@ export default function App() {
         <main className="page-main mx-auto w-full max-w-7xl px-4 pb-10 pt-6 sm:px-6 lg:px-8">
           <Suspense fallback={<div className="surface surface-pad page-loading">Loading page…</div>}>
             {page === "overview" && <OverviewPage onNavigate={navigate} />}
-            {page === "trend" && <TrendExplorerPage />}
+            {page === "trend" && <TrendExplorerPage initialSelection={trendSelection} />}
             {page === "relationships" && <RelationshipsPage onNavigate={() => navigate("methodology")} />}
             {page === "monsoon" && <IndiaMonsoonPage />}
             {page === "datasets" && <DatasetsPage />}

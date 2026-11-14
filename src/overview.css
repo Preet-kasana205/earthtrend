@@ -12,7 +12,26 @@
 .banner-footnote { position:absolute; z-index:2; right:22px; bottom:17px; display:flex; align-items:center; gap:7px; color:#7892a9; font:500 9px var(--mono); }
 .banner-footnote i { width:3px; height:3px; border-radius:50%; background:#3b536d; }
 .map-layout { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(230px,.8fr); gap:14px; align-items:stretch; }
+.overview-map-layout { grid-template-columns:minmax(0,1fr); }
 .map-panel { min-width:0; overflow:hidden; }
+.interactive-map-canvas { padding:0; }
+.interactive-leaflet-map { z-index:0; width:100%; height:460px; background:#080f1c; }
+.map-region-controls { position:absolute; z-index:1000; top:10px; right:10px; display:flex; flex-wrap:wrap; justify-content:flex-end; gap:6px; max-width:calc(100% - 56px); }
+.map-region-controls button { min-height:40px; padding:0 11px; border:1px solid #243b5c; border-radius:8px; background:#101b2d; color:#aebdd0; font:500 13px var(--mono); cursor:pointer; box-shadow:0 2px 10px #0006; }
+.map-region-controls button:hover,.map-region-controls button.is-selected { border-color:#087d96; background:#12303b; color:#b5e9ed; }
+.map-region-controls button:focus-visible,.map-popup-button:focus-visible { outline:2px solid #06b6d4; outline-offset:2px; }
+.overview-map-popup .leaflet-popup-content-wrapper { border:1px solid #243b5c; border-radius:10px; background:#101b2d; color:#dbe6f4; box-shadow:0 8px 24px #0008; }
+.overview-map-popup .leaflet-popup-tip { background:#101b2d; }
+.overview-map-popup .leaflet-popup-content { margin:12px 14px; min-width:190px; font-size:14px; line-height:1.5; }
+.overview-map-popup .leaflet-popup-close-button { color:#aebdd0 !important; }
+.overview-map-popup p { margin:6px 0; color:#c4d0df; font-size:14px; line-height:1.5; }
+.overview-map-popup small { display:block; margin-top:6px; color:#899bb2; font-size:13px; line-height:1.45; }
+.overview-map-popup-content > strong { color:#e7eef9; font-size:15px; }
+.map-popup-button { width:100%; min-height:40px; margin-top:10px; padding:0 12px; border:1px solid #087d96; border-radius:8px; background:#102b37; color:#b5e9ed; font-size:14px; font-weight:500; cursor:pointer; }
+.map-fallback-stack { display:grid; gap:8px; min-width:0; }
+.map-fallback-message { margin:0; padding:8px 12px; border:1px solid #243b5c; border-radius:8px; background:#101b2d; color:#9aabc0; font-size:14px; line-height:1.4; }
+.leaflet-control-attribution { max-width:calc(100% - 84px); white-space:normal; line-height:1.3; }
+.leaflet-touch .leaflet-bar a { width:36px; height:36px; line-height:36px; }
 .map-panel-heading { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:17px 18px 0; }
 .map-panel-heading .eyebrow { margin-bottom:5px; }
 .map-schematic-label { display:flex; align-items:center; gap:5px; color:#6f879e; font:500 9px var(--mono); }
@@ -51,4 +70,4 @@
 .caveat-status { flex:0 0 auto; align-self:center; padding:5px 7px; border:1px solid #5b4c22; border-radius:6px; color:#efce66; font:500 8px var(--mono); white-space:nowrap; }
 
 @media(max-width:950px) { .overview-banner-mark { right:3%; transform:translateY(-55%) scale(.82); } .map-layout { grid-template-columns:1fr; } .map-context { display:grid; grid-template-columns:1fr 1fr; column-gap:22px; } .map-context .eyebrow,.map-context h3,.map-context .surface-subtitle { grid-column:1/-1; } .map-context-divider { display:none; } .map-coordinate { align-self:end; } .text-link { grid-column:1/-1; } }
-@media(max-width:600px) { .overview-banner { padding-bottom:48px; } .overview-banner-mark { right:-34px; opacity:.7; transform:translateY(-60%) scale(.7); } .overview-banner-copy { max-width:100%; } .banner-footnote { left:22px; right:auto; font-size:8px; } .map-canvas svg { min-height:180px; } .map-panel-foot { flex-direction:column; } .map-context { display:flex; } .map-context-divider { display:block; } .caveat-status { align-self:flex-start; } }
+@media(max-width:600px) { .overview-banner { padding-bottom:48px; } .overview-banner-mark { right:-34px; opacity:.7; transform:translateY(-60%) scale(.7); } .overview-banner-copy { max-width:100%; } .banner-footnote { left:22px; right:auto; font-size:8px; } .map-canvas svg { min-height:180px; } .interactive-leaflet-map { height:320px; } .map-region-controls { left:54px; right:8px; top:8px; gap:5px; } .map-region-controls button { min-height:40px; padding:0 8px; font-size:12px; } .map-panel-foot { flex-direction:column; } .map-context { display:flex; } .map-context-divider { display:block; } .caveat-status { align-self:flex-start; } }

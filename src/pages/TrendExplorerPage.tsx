@@ -13,6 +13,7 @@ import { pacificSeptemberBaselineMeans } from "../data/pacificSeptemberBaselineM
 import { modisAquaMonthlySst, modisAquaSstMetadata } from "../data/modisAquaSstData";
 import { gldasSoilMoisture, type SoilMoistureRegion } from "../data/gldasSoilMoistureData";
 import { analyzeTrend } from "../lib/trendAnalysis";
+import type { TrendSelection } from "../lib/overviewMapRegions.js";
 
 type TrendVariable = "nino34" | "pacific-rainfall" | "oras5" | "soil-moisture" | "modis-aqua";
 const directionLabels = {
@@ -70,9 +71,9 @@ function TrendResult({
   );
 }
 
-export function TrendExplorerPage() {
-  const [variable, setVariable] = useState<TrendVariable>("soil-moisture");
-  const [region, setRegion] = useState<SoilMoistureRegion>("Rajasthan");
+export function TrendExplorerPage({ initialSelection }: { initialSelection?: TrendSelection } = {}) {
+  const [variable, setVariable] = useState<TrendVariable>(initialSelection?.variable ?? "soil-moisture");
+  const [region, setRegion] = useState<SoilMoistureRegion>(initialSelection?.variable === "soil-moisture" ? initialSelection.region : "Rajasthan");
   const soilMoistureSeries = region === "Rajasthan" ? rajasthanSeries : assamSeries;
   const soilMoistureChart = soilMoistureSeries.map((point) => ({ date: point.date, value: point.value }));
   const significanceText = {
