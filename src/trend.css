@@ -10,3 +10,31 @@
 .context-icon.teal { color:#56d2bf; background:#102b2d; }
 .context-source { margin:2px 0 3px; color:#657c96; font:400 8px var(--mono); }
 @media(max-width:700px) { .trend-observation-count { margin-top:4px; } .trend-context-grid { grid-template-columns:1fr; } }
+
+.trend-selector { display:grid; grid-template-columns:minmax(260px,1fr) auto minmax(190px,.75fr); align-items:end; gap:18px; }
+.trend-select-field { display:grid; gap:7px; }
+.trend-select-field select { width:100%; min-height:40px; padding:0 12px; border:1px solid #243b5c; border-radius:8px; background:#101b2d; color:#e4edf8; font:500 11px var(--mono); }
+.trend-select-field select:focus-visible,.region-select-options button:focus-visible { outline:2px solid #06b6d4; outline-offset:2px; }
+.region-select-field { min-width:220px; margin:0; padding:0; border:0; }
+.region-select-field legend { margin-bottom:7px; padding:0; }
+.region-select-options { display:flex; gap:7px; }
+.region-select-options button { display:flex; align-items:center; justify-content:center; gap:7px; min-height:40px; padding:0 12px; border:1px solid #243b5c; border-radius:8px; background:#101b2d; color:#91a3ba; font:500 10px var(--mono); cursor:pointer; }
+.region-select-options button.is-selected { border-color:#087d96; background:#10303b; color:#9beaf1; }
+.trend-selector-note { align-self:center; color:#7186a0; font-size:10px; line-height:1.5; }
+.soil-trend-section { display:grid; gap:12px; }
+.soil-trend-heading { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; }
+.soil-trend-heading h3 { margin:4px 0 0; color:#e4edf8; font-size:15px; font-weight:600; }
+.soil-trend-method { color:#8197b1; font:500 8px var(--mono); text-align:right; }
+.soil-trend-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.soil-trend-result { display:flex; min-width:0; flex-direction:column; align-items:flex-start; gap:10px; }
+.soil-trend-slope { color:#e9f5ff; font:700 21px var(--mono); letter-spacing:-.04em; }
+.soil-trend-slope span { color:#8fa6bf; font-size:10px; font-weight:500; letter-spacing:0; }
+.soil-trend-stat-line { display:flex; width:100%; align-items:center; justify-content:space-between; gap:12px; color:#8197b1; font-size:10px; }
+.soil-trend-stat-line strong { color:#dbe8f6; font:600 10px var(--mono); }
+.soil-significance { display:inline-flex; align-items:center; min-height:24px; padding:3px 9px; border:1px solid; border-radius:99px; font:600 8px var(--mono); letter-spacing:.04em; text-transform:uppercase; }
+.soil-significance.is-significant { border-color:#176c5e; background:#102b2b; color:#74dcc0; }
+.soil-significance.is-not-significant { border-color:#3d536e; background:#152338; color:#a5b5ca; }
+.soil-region-compare p { margin:0; color:#91a3ba; font-size:10px; line-height:1.55; }
+.soil-trend-footnote { margin:0; color:#7186a0; font-size:9px; line-height:1.6; }
+@media(max-width:900px) { .soil-trend-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .soil-region-compare { grid-column:1/-1; } }
+@media(max-width:700px) { .trend-selector { grid-template-columns:1fr; align-items:stretch; gap:14px; } .trend-select-field select { font-size:10px; } .trend-selector-note { align-self:auto; } .soil-trend-heading { align-items:flex-start; flex-direction:column; } .soil-trend-method { text-align:left; } .soil-trend-grid { grid-template-columns:1fr; } .soil-region-compare { grid-column:auto; } }

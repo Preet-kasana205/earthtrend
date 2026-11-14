@@ -7,7 +7,7 @@ EarthTrend is a static, source-traceable dashboard for exploring verified Pacifi
 ## Pages
 
 1. **Overview** — Niño-3.4 reference map and four verified headline values.
-2. **Trend Explorer** — Recharts views of monthly Niño-3.4 SST anomalies, September 2026 daily Pacific rainfall, and the complete ORAS5 historical series.
+2. **Trend Explorer** — a source selector for monthly Niño-3.4 SST anomalies, September 2026 daily Pacific rainfall, the complete ORAS5 historical series, and NASA GLDAS soil moisture for Rajasthan or Assam, with computed trend statistics.
 3. **Relationships** — side-by-side, dated agency assessments and a separation of observed variables; no significance test is reported.
 4. **India Monsoon** — the 2026 seasonal total and monthly percentages of the Long Period Average (LPA).
 5. **Datasets** — source-to-visualization traceability matrix and the preserved raw-file manifest.
@@ -20,7 +20,8 @@ EarthTrend is a static, source-traceable dashboard for exploring verified Pacifi
 - Tailwind CSS v4 through `@tailwindcss/vite`; shared dark design tokens and responsive sidebar/top bar/footer.
 - Recharts line and bar charts with tooltips and gridlines; lucide-react icons.
 - `src/data/realData.ts` contains verified headline values and their source, period, baseline, and caveat metadata. Preparedness curriculum content is in `src/data/phase3Data.ts`.
-- Chart series extracted from original files live in `src/data/pacificDailyRainfall2026.ts` and `src/data/oras5ThermoclineData.ts`.
+- Chart series extracted from original files live in `src/data/pacificDailyRainfall2026.ts`, `src/data/oras5ThermoclineData.ts`, and `src/data/gldasSoilMoistureData.ts`.
+- `src/lib/trendAnalysis.ts` computes Theil–Sen slopes and two-sided Mann–Kendall p-values from the supplied monthly observations; results are not hardcoded.
 - `src/data/raw/` stores the original source files unchanged. There is no application backend or live data endpoint.
 
 ## Datasets and sources
@@ -30,6 +31,7 @@ EarthTrend is a static, source-traceable dashboard for exploring verified Pacifi
 | Monthly Niño-3.4 SST anomaly | NOAA CPC, ERSST v5 | September and October 2026; 1991–2020 baseline | Monthly SST anomaly, explicitly not ONI |
 | Pacific daily precipitation rate | NASA Giovanni, GPM IMERG v07 Late Run | 1–30 September 2026; September daily baseline 2001–2019 (570 observations) | mm/day; 30 raw daily observations |
 | 20°C isotherm source values | ECMWF/Copernicus ORAS5 workbook | January 1958–November 2025; 815 monthly observations; 0°N, 110°W | Unit unconfirmed in source header; never labelled metres |
+| Soil moisture content, 0–10 cm | NASA Giovanni, GLDAS Noah v2.1 monthly | January 2000–December 2025; 312 months each for Rajasthan and Assam | kg/m²; raw area-averaged monthly values; computed regional trends |
 | Indian Ocean Dipole assessment | Australian Bureau of Meteorology and India Meteorological Department | BoM week to 8 November 2026; IMD assessment 31 October 2026 | Agency assessments shown separately with dates |
 | Southwest monsoon rainfall | India Meteorological Department | June–September 2026; 1971–2020 LPA | Seasonal total and monthly percentages of LPA |
 | Subsurface temperature anomalies | NOAA CPC | October 2026 | Separate variable from ORAS5 isotherm depth |
@@ -41,17 +43,20 @@ EarthTrend is a static, source-traceable dashboard for exploring verified Pacifi
 - `src/data/raw/sep_26g4.areaAvgTimeSeries.GPM_3IMERGDL_07_precipitation.20260901-20260930.170W_5S_120W_5N.csv`
 - `src/data/raw/g4.areaAvgTimeSeries.GPM_3IMERGDL_07_precipitation.20010101-20200101.170W_5S_120W_5N.csv`
 - `src/data/raw/ORAS5_Thermocline_Cleaned_1958_2025_No_Readme.xlsx`
+- `src/data/raw/g4.areaAvgTimeSeries.GLDAS_NOAH025_M_2_1_SoilMoi0_10cm_inst.20000101-20251231.69E_23N_78E_30N.csv` (Rajasthan)
+- `src/data/raw/g4.areaAvgTimeSeries.GLDAS_NOAH025_M_2_1_SoilMoi0_10cm_inst.20000101-20251231.89E_24N_96E_28N.csv` (Assam)
 
 ## Methodology and scientific safeguards
 
 - September 2026 rainfall: 30 daily observations sum to **132.9762 mm**, giving a mean of **4.4325 mm/day**.
 - September 2001–2019 baseline: 570 daily observations sum to **383.7893 mm**, giving a mean of **0.6733 mm/day**.
 - Mean departure: **4.4325 − 0.6733 = +3.7592 mm/day**.
-- The chart modules are reproducibly generated from the preserved CSV and XLSX sources. The extraction checks dates, record counts, duplicates, missing/nonnumeric values, coordinates, source header, and reported calculations. No synthetic points or missing-value interpolation is used.
+- The chart modules are reproducibly generated from the preserved CSV and XLSX sources. The extraction checks dates, record counts, duplicates, missing/nonnumeric values, coordinates, source headers, and reported calculations. No synthetic points or missing-value interpolation is used.
+- GLDAS trends use the median of pairwise Theil–Sen slopes, annualized by elapsed calendar time, and a two-sided standard Mann–Kendall test with tie-corrected variance and continuity correction at α = 0.05. The p-value uses a normal approximation; the test does not adjust for seasonality or serial autocorrelation. A rising annual-mean soil moisture value does not mean droughts did not occur.
 - Monthly Niño-3.4 SST anomalies are not ONI. ONI is a three-month running index.
 - ORAS5 thermocline source values keep the workbook's unconfirmed-units caveat. NOAA CPC subsurface temperature anomalies remain a separate variable.
 - Sea-surface height is pattern-only. Phase 3 provides preparedness education and does not issue predictions or alerts.
-- **Significance not assessed** unless a documented statistical test is added.
+- Trend significance is assessed only for the GLDAS soil moisture series using the documented Mann–Kendall test. Other displayed series remain descriptive; statistical significance does not establish causation.
 - Data snapshot frozen as of 13 November 2026.
 
 ## Setup
@@ -69,7 +74,7 @@ npm run build
 npm run lint
 ```
 
-The data test checks headline values and typed series. To validate the original files and ensure the generated modules match them, install the extraction dependency and run:
+The data test checks headline values, typed series, and dynamically computed GLDAS trend values. To validate the original files and ensure the generated modules match them, install the XLSX extraction dependency and run:
 
 ```bash
 python -m pip install -r requirements-extraction.txt

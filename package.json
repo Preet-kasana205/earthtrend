@@ -9,8 +9,8 @@
     "lint": "oxlint",
     "test": "node scripts/validateData.mjs",
     "preview": "vite preview",
-    "data:extract": "python scripts/extractChartData.py",
-    "data:check": "python scripts/extractChartData.py --check"
+    "data:extract": "python scripts/extractChartData.py && python scripts/extractGldasSoilMoisture.py",
+    "data:check": "python scripts/extractChartData.py --check && python scripts/extractGldasSoilMoisture.py --check"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.5",
