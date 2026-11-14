@@ -52,7 +52,7 @@ export function IndiaMonsoonPage() {
         </div>
       </section>
 
-      <ScientificCaveat>Significance not assessed. The seasonal percentage is a descriptive comparison against the IMD 1971–2020 LPA.</ScientificCaveat>
+      <ScientificCaveat>Significance not assessed. These four monthly values are seasonal percentages against the IMD LPA for one monsoon season, not a comparable multi-year time series for trend testing.</ScientificCaveat>
     </section>
   );
 }

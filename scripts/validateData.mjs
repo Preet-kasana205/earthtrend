@@ -1,9 +1,12 @@
 import { nino34, pacificRainfall, iod, monsoon2026, thermocline } from "../src/data/realData.ts";
 import { pacificDailyRainfall2026 } from "../src/data/pacificDailyRainfall2026.ts";
 import { oras5ThermoclineData } from "../src/data/oras5ThermoclineData.ts";
+import { pacificSeptemberBaselineMeans } from "../src/data/pacificSeptemberBaselineMeans.ts";
+import { modisAquaMonthlySst, modisAquaSstMetadata } from "../src/data/modisAquaSstData.ts";
 import { traceabilityData } from "../src/data/traceabilityData.ts";
 import { gldasSoilMoisture } from "../src/data/gldasSoilMoistureData.ts";
 import { gldasTraceabilityData } from "../src/data/gldasTraceabilityData.ts";
+import { modisAquaTraceabilityData } from "../src/data/modisAquaTraceabilityData.ts";
 import { analyzeTrend } from "../src/lib/trendAnalysis.ts";
 import assert from "node:assert";
 
@@ -92,4 +95,58 @@ assert(gldasTraceabilityData.productDataset.includes("v2.1"), "Traceability must
 assert(gldasTraceabilityData.temporalPeriod.includes("312 monthly observations per region"), "Traceability must identify the verified periods and counts");
 assert(gldasTraceabilityData.destinationComponent.includes("Trend Explorer"), "Traceability must point to the selector");
 console.log("✔ Test 6 Passed: NASA GLDAS is represented in the source-to-visualization matrix.");
+
+console.log("\nTest 7: ORAS5 and Pacific September Trend Analysis");
+const oras5Trend = analyzeTrend(oras5ThermoclineData, {
+  positive: "upward trend in source values",
+  negative: "downward trend in source values",
+});
+assert(Math.abs(oras5Trend.senSlopePerYear - -0.1491984203) < 0.000001, `ORAS5 slope unexpected: ${oras5Trend.senSlopePerYear}`);
+assert(Math.abs(oras5Trend.mannKendallP - 0.0007040684) < 0.00000001, `ORAS5 Mann-Kendall p unexpected: ${oras5Trend.mannKendallP}`);
+assert.strictEqual(oras5Trend.significanceLabel, "Significant downward trend in source values");
+assert.strictEqual(pacificSeptemberBaselineMeans.length, 19, "September baseline trend requires 19 annual means");
+assert.strictEqual(pacificSeptemberBaselineMeans[0].year, 2001);
+assert.strictEqual(pacificSeptemberBaselineMeans[18].year, 2019);
+assert(pacificSeptemberBaselineMeans.every((point) => point.observationCount === 30 && Number.isFinite(point.value)), "Each annual September mean must use 30 numeric daily observations");
+const septemberRainTrend = analyzeTrend(pacificSeptemberBaselineMeans, {
+  positive: "upward trend in September rainfall rate",
+  negative: "downward trend in September rainfall rate",
+});
+assert(Math.abs(septemberRainTrend.senSlopePerYear - -0.0100477377) < 0.000001, `September rainfall trend slope unexpected: ${septemberRainTrend.senSlopePerYear}`);
+assert(Math.abs(septemberRainTrend.mannKendallP - 0.5756368657) < 0.00000001, `September rainfall Mann-Kendall p unexpected: ${septemberRainTrend.mannKendallP}`);
+assert.strictEqual(septemberRainTrend.significanceLabel, "Not significant downward trend in September rainfall rate");
+console.log(`  ORAS5 (815 monthly): Sen slope=${oras5Trend.senSlopePerYear.toFixed(8)} source-values/year; Mann-Kendall p=${oras5Trend.mannKendallP.toFixed(8)}; ${oras5Trend.significanceLabel}`);
+console.log(`  September baseline (19 annual means): Sen slope=${septemberRainTrend.senSlopePerYear.toFixed(8)} mm/day/year; Mann-Kendall p=${septemberRainTrend.mannKendallP.toFixed(8)}; ${septemberRainTrend.significanceLabel}`);
+console.log("✔ Test 7 Passed: both long-series trends are computed from the source observations.");
+console.log("\nTest 8: MODIS Aqua Absolute SST Series and Trend");
+assert.strictEqual(modisAquaMonthlySst.length, 281);
+assert.strictEqual(modisAquaMonthlySst[0].date, "2002-08", "Raw varying dates must normalize to the August 2002 month");
+assert.strictEqual(modisAquaMonthlySst[280].date, "2025-12");
+assert.strictEqual(new Set(modisAquaMonthlySst.map((point) => point.date)).size, 281);
+assert(modisAquaMonthlySst.every((point) => /^\d{4}-\d{2}$/.test(point.date) && Number.isInteger(point.year) && Number.isInteger(point.month) && Number.isFinite(point.value)), "MODIS chart dates must be normalized months with finite values");
+assert(!modisAquaMonthlySst.some((point) => point.date === "2002-07"), "July 2002 is missing from the observations");
+for (let index = 1; index < modisAquaMonthlySst.length; index += 1) {
+  const previous = modisAquaMonthlySst[index - 1];
+  const current = modisAquaMonthlySst[index];
+  const expected = previous.month === 12 ? `${previous.year + 1}-01` : `${previous.year}-${String(previous.month + 1).padStart(2, "0")}`;
+  assert.strictEqual(current.date, expected, `MODIS dates must be continuous after ${previous.date}`);
+}
+assert.strictEqual(modisAquaSstMetadata.classification, "ABSOLUTE SST");
+assert.strictEqual(modisAquaSstMetadata.units, "°C");
+assert.strictEqual(modisAquaSstMetadata.interpretation, "Absolute SST, not an anomaly");
+assert.strictEqual(modisAquaTraceabilityData.verificationStatus, "Caution / Caveated");
+assert(modisAquaTraceabilityData.variableName.includes("ABSOLUTE SST"));
+assert(modisAquaTraceabilityData.processingCalculation.includes("YYYY-MM"));
+assert(modisAquaTraceabilityData.destinationComponent.includes("Trend Explorer"));
+const modisTrend = analyzeTrend(modisAquaMonthlySst, {
+  positive: "upward trend in absolute SST",
+  negative: "downward trend in absolute SST",
+  notSignificant: "No significant long-term trend detected",
+});
+assert(Math.abs(modisTrend.senSlopePerYear - -0.00771731) < 0.000001, `MODIS trend slope unexpected: ${modisTrend.senSlopePerYear}`);
+assert(Math.abs(modisTrend.mannKendallP - 0.42978632) < 0.000001, `MODIS Mann-Kendall p unexpected: ${modisTrend.mannKendallP}`);
+assert.strictEqual(modisTrend.significanceLabel, "No significant long-term trend detected");
+console.log(`  MODIS Aqua (281 monthly): Sen slope=${modisTrend.senSlopePerYear.toFixed(8)} C/year; Mann-Kendall p=${modisTrend.mannKendallP.toFixed(8)}; ${modisTrend.significanceLabel}`);
+console.log("✔ Test 8 Passed: month-normalized absolute SST and computed trend verified.");
+
 console.log("\nAll EarthTrend data validation tests passed successfully!");

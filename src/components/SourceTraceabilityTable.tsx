@@ -2,8 +2,9 @@ import "../traceability.css";
 import "../traceability.css";
 import { traceabilityData } from "../data/traceabilityData";
 import { gldasTraceabilityData } from "../data/gldasTraceabilityData";
+import { modisAquaTraceabilityData } from "../data/modisAquaTraceabilityData";
 
-const allTraceabilityData = [...traceabilityData, gldasTraceabilityData];
+const allTraceabilityData = [...traceabilityData, gldasTraceabilityData, modisAquaTraceabilityData];
 
 export function SourceTraceabilityTable() {
   return (
