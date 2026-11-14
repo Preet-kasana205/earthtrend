@@ -124,3 +124,6 @@
   .page-intro { align-items: flex-start; flex-direction: column; }
   .footer-inner { align-items: flex-start; }
 }
+
+.page-loading { color:#8da0ba; font-size:12px; }
+

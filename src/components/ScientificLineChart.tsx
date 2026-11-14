@@ -1,3 +1,4 @@
+import "../charts.css";
 import { CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 export interface LineChartPoint {
@@ -43,3 +44,4 @@ export function ScientificLineChart({ data, title, seriesLabel, units, source, p
     </section>
   );
 }
+
