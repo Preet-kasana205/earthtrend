@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "../phase3.css";
 import "../phase3.css";
 import { ArrowUpRight, BookOpen, GraduationCap, ShieldCheck } from "lucide-react";
@@ -6,6 +7,7 @@ import { phase3Data } from "../data/phase3Data";
 import { PageFinding, PageSummary } from "../components/PageFinding";
 
 export function Phase3Page() {
+  const [videoSourceFailed, setVideoSourceFailed] = useState(false);
   const impact = phase3Data.historicalStats.cseJanSep2026;
   return (
     <section className="page-section phase3-page">
@@ -43,7 +45,7 @@ export function Phase3Page() {
         <div className="cyclone-context"><strong>Named event records in the project notes</strong><ul>{phase3Data.historicalStats.cyclones.map((cyclone) => <li key={cyclone.name}><span>{cyclone.name}</span><span>{cyclone.impact}</span></li>)}</ul></div>
       </section>
 
-      <section className="video-note surface surface-pad"><div className="prepared-icon"><BookOpen size={18} /></div><div><div className="eyebrow">Training resource</div><p>{phase3Data.videoNote}</p></div></section>
+      <section className="video-note surface surface-pad"><div className="prepared-icon"><BookOpen size={18} /></div><div className="video-note-content"><div className="eyebrow">Training resource</div>{videoSourceFailed ? <iframe className="video-note-drive-preview" title="Phase 3 training video" src="https://drive.google.com/file/d/16y742JXuAHgI-ExMxDGyMwJSggqrTZbc/preview" allow="autoplay; fullscreen" allowFullScreen /> : <video controls preload="metadata" playsInline aria-label="Phase 3 training video" src="https://drive.google.com/uc?export=download&id=16y742JXuAHgI-ExMxDGyMwJSggqrTZbc" onError={() => setVideoSourceFailed(true)}>Video playback is not supported by this browser.</video>}<p className="video-note-caption">Phase 3 training video (54 seconds). Source for figures: CSE, Jan–Sep 2026.</p></div></section>
       <ScientificCaveat>Phase 3 provides educational preparedness context only. It does not generate hazard probabilities, forecasts, or emergency alerts.</ScientificCaveat>
     </section>
   );

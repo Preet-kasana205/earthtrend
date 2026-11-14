@@ -34,6 +34,9 @@
 .cyclone-context ul { display:grid; gap:6px; margin:9px 0 0; padding:0; list-style:none; }
 .cyclone-context li { display:grid; grid-template-columns:150px 1fr; gap:10px; color:#9aabc0; font-size:9px; line-height:1.5; }
 .cyclone-context li span:first-child { color:#d8e4f0; font-weight:600; }
-.video-note { display:flex; align-items:center; gap:12px; }
-.video-note p { margin:5px 0 0; color:#879bb0; font-size:9px; line-height:1.6; }
+.video-note { display:flex; align-items:flex-start; gap:12px; }
+.video-note-content { min-width:0; flex:1; }
+.video-note video { display:block; width:100%; max-height:360px; margin-top:10px; border-radius:9px; background:#080f1c; }
+.video-note-drive-preview { display:block; width:100%; height:360px; margin-top:10px; border:0; border-radius:9px; background:#080f1c; }
+.video-note-caption { margin:8px 0 0; color:#879bb0; font-size:14px; line-height:1.6; }
 @media(max-width:680px) { .prepared-banner { align-items:flex-start; flex-wrap:wrap; } .prepared-status { margin-left:67px; } .guidance-links { grid-template-columns:1fr; } .learning-heading { align-items:flex-start; flex-direction:column; } .impact-strip { grid-template-columns:1fr; } .cyclone-context li { grid-template-columns:1fr; gap:2px; } }
