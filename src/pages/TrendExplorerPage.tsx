@@ -9,10 +9,11 @@ import { nino34, ssh, thermocline } from "../data/realData";
 import { oras5ThermoclineData } from "../data/oras5ThermoclineData";
 import { pacificDailyRainfall2026 } from "../data/pacificDailyRainfall2026";
 import { pacificSeptemberBaselineMeans } from "../data/pacificSeptemberBaselineMeans";
+import { modisAquaMonthlySst, modisAquaSstMetadata } from "../data/modisAquaSstData";
 import { gldasSoilMoisture, type SoilMoistureRegion } from "../data/gldasSoilMoistureData";
 import { analyzeTrend } from "../lib/trendAnalysis";
 
-type TrendVariable = "nino34" | "pacific-rainfall" | "oras5" | "soil-moisture";
+type TrendVariable = "nino34" | "pacific-rainfall" | "oras5" | "soil-moisture" | "modis-aqua";
 const directionLabels = {
   oras5: { positive: "upward trend in source values", negative: "downward trend in source values" },
   rainfall: { positive: "upward trend in September rainfall rate", negative: "downward trend in September rainfall rate" },
@@ -24,12 +25,18 @@ const ninoMonthly = [
 ];
 const dailyRainfall = pacificDailyRainfall2026.map((point) => ({ label: point.date, value: point.precipitation }));
 const oras5Values = oras5ThermoclineData.map((point) => ({ date: point.date, value: point.value }));
+const modisSstValues = modisAquaMonthlySst.map((point) => ({ date: point.date, value: point.value }));
 const baselineSeptemberValues = pacificSeptemberBaselineMeans.map((point) => ({ date: point.date, value: point.value }));
 const rajasthanSeries = gldasSoilMoisture.filter((point) => point.region === "Rajasthan");
 const assamSeries = gldasSoilMoisture.filter((point) => point.region === "Assam");
 const rajasthanTrend = analyzeTrend(rajasthanSeries);
 const assamTrend = analyzeTrend(assamSeries);
 const oras5Trend = analyzeTrend(oras5ThermoclineData, directionLabels.oras5);
+const modisAquaTrend = analyzeTrend(modisAquaMonthlySst, {
+  positive: "upward long-term trend in absolute SST",
+  negative: "downward long-term trend in absolute SST",
+  notSignificant: "No significant long-term trend detected",
+});
 const baselineSeptemberTrend = analyzeTrend(pacificSeptemberBaselineMeans, directionLabels.rainfall);
 const regionMean = (points: typeof rajasthanSeries) => points.reduce((sum, point) => sum + point.value, 0) / points.length;
 const rajasthanMean = regionMean(rajasthanSeries);
@@ -72,13 +79,14 @@ export function TrendExplorerPage() {
     "pacific-rainfall": "The 19 annual September means are tested below; they use 30 daily observations for the same calendar month in each year. Serial autocorrelation is not adjusted. The separate September 2026 daily chart is descriptive.",
     oras5: "ORAS5 uses the standard Mann–Kendall test on all 815 monthly source values. Units remain unconfirmed; no seasonal or serial-autorrelation correction is applied.",
     nino34: "Significance not assessed: only two monthly observations are available (September +2.1°C and October +2.5°C), too short for a trend test.",
+    "modis-aqua": "This is ABSOLUTE SST in °C, not an anomaly. No significant long-term trend is detected; ENSO variability dominates over this 23-year record. CPC Niño-3.4 anomalies are shown in a separate panel with their own ERSST 1991–2020 baseline.",
   }[variable];
 
   return (
     <section className="page-section trend-page">
       <div className="page-intro">
         <div><div className="eyebrow">Observed time series</div><h2>Explore the records</h2><p>Choose a source series to view its original observations. The charts do not fill missing dates or interpolate values.</p></div>
-        <div className="trend-observation-count"><Activity size={15} /><span className="mono">4 source series · GLDAS 312/monthly per region</span></div>
+        <div className="trend-observation-count"><Activity size={15} /><span className="mono">5 selectable variables · GLDAS 312/monthly per region</span></div>
       </div>
 
       <section className="trend-selector surface surface-pad" aria-label="Trend series selector">
@@ -86,6 +94,7 @@ export function TrendExplorerPage() {
           <span className="eyebrow">Variable</span>
           <select id="trend-variable" value={variable} onChange={(event) => setVariable(event.target.value as TrendVariable)}>
             <option value="soil-moisture">Soil moisture (NASA GLDAS)</option>
+            <option value="modis-aqua">Sea surface temperature (NASA MODIS Aqua)</option>
             <option value="nino34">Monthly Niño-3.4 SST anomaly</option>
             <option value="pacific-rainfall">Pacific precipitation (NASA GPM)</option>
             <option value="oras5">ORAS5 depth of 20°C isotherm</option>
@@ -146,6 +155,40 @@ export function TrendExplorerPage() {
             color="#14b8a6"
             valueDigits={2}
             tickFormatter={(value) => value.slice(0, 4)}
+          />
+        </>
+      ) : variable === "modis-aqua" ? (
+        <>
+          <ScientificLineChart
+            data={modisSstValues}
+            title="ABSOLUTE SST · MODIS Aqua daytime 11 μm"
+            seriesLabel="ABSOLUTE SST · not an anomaly"
+            units={modisAquaSstMetadata.units}
+            source={`${modisAquaSstMetadata.source} · ${modisAquaSstMetadata.spatialDomain}`}
+            period={modisAquaSstMetadata.period}
+            caveat="Absolute sea surface temperature in °C, not an anomaly. Original source dates with varying days are reduced to YYYY-MM; no interpolation is used."
+            color="#fbbf24"
+            valueDigits={1}
+            tickFormatter={(value) => value.slice(0, 4)}
+          />
+          <section className="soil-trend-section" aria-label="Computed MODIS Aqua absolute SST trend">
+            <div className="soil-trend-heading"><div><div className="eyebrow">Computed from all 281 month-normalized observations</div><h3>MODIS Aqua absolute SST trend</h3></div><span className="soil-trend-method">Theil–Sen slope · two-sided Mann–Kendall · α = 0.05</span></div>
+            <div className="soil-trend-grid single">
+              <TrendResult title="ABSOLUTE SST · MODIS Aqua" period="Aug 2002–Dec 2025" result={modisAquaTrend} slopeUnits="°C/year" note="This is absolute SST, not an anomaly. ENSO variability dominates over this 23-year record." />
+            </div>
+            <p className="soil-trend-footnote">The standard test uses the monthly values with tie and continuity correction; no seasonal stratification or serial-autocorrelation adjustment is applied. NOAA CPC Niño-3.4 anomalies below are a separate product and baseline.</p>
+          </section>
+          <ScientificLineChart
+            data={ninoMonthly}
+            title="NOAA CPC monthly Niño-3.4 SST anomaly · separate context"
+            seriesLabel="CPC monthly Niño-3.4 anomaly · not MODIS absolute SST"
+            units="°C anomaly"
+            source="NOAA CPC · ERSST v5"
+            period="Sep 2026 +2.1°C · Oct 2026 +2.5°C · 1991–2020 baseline"
+            caveat="These two CPC anomaly observations use their own ERSST 1991–2020 baseline and are not joined to the MODIS absolute SST series. Two points are too short for a separate trend test."
+            color="#fb7185"
+            valueDigits={1}
+            tickFormatter={(value) => value.slice(5)}
           />
         </>
       ) : variable === "nino34" ? (

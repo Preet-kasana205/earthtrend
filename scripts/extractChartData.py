@@ -17,6 +17,8 @@ ORAS5 = RAW / "ORAS5_Thermocline_Cleaned_1958_2025_No_Readme.xlsx"
 PACIFIC_OUT = ROOT / "src" / "data" / "pacificDailyRainfall2026.ts"
 ORAS5_OUT = ROOT / "src" / "data" / "oras5ThermoclineData.ts"
 PACIFIC_BASELINE_OUT = ROOT / "src" / "data" / "pacificSeptemberBaselineMeans.ts"
+MODISA_SST = RAW / "g4.areaAvgTimeSeries.MODISA_L3m_SST_Monthly_4km_R2019_0_sst.20020701-20251231.170W_5S_120W_5N.csv"
+MODISA_OUT = ROOT / "src" / "data" / "modisAquaSstData.ts"
 
 
 def read_giovanni(path: Path) -> list[dict[str, Any]]:
@@ -38,6 +40,73 @@ def read_giovanni(path: Path) -> list[dict[str, Any]]:
             raise ValueError(f"Invalid/fill value in {path.name} on {row['time']}: {value}")
         result.append({"date": date.fromisoformat(row["time"]), "value": value})
     return result
+
+
+
+def read_modis_aqua_monthly() -> tuple[list[dict[str, Any]], list[date]]:
+    with MODISA_SST.open("r", encoding="utf-8-sig", newline="") as handle:
+        lines = handle.readlines()
+    header_index = next((i for i, line in enumerate(lines) if line.lower().startswith("time,")), None)
+    if header_index is None:
+        raise ValueError(f"No Giovanni table header found in {MODISA_SST.name}")
+
+    metadata: dict[str, str] = {}
+    for line in lines[:header_index]:
+        row = next(csv.reader([line]))
+        if len(row) > 1:
+            metadata[row[0].strip().rstrip(":")] = row[1].strip()
+    title = metadata.get("Title", "")
+    if "Sea Surface Temperature at 11 microns (Day)" not in title or "MODIS-Aqua (monthly)" not in title:
+        raise ValueError("MODIS source must be the monthly daytime 11-micron MODIS-Aqua SST product")
+    if metadata.get("User Bounding Box") != "-170,-5,-120,5":
+        raise ValueError(f"Unexpected MODIS Niño-3.4 box: {metadata.get('User Bounding Box')}")
+    if metadata.get("User Start Date") != "2002-07-01T00:00:00Z" or metadata.get("User End Date") != "2025-12-31T23:59:59Z":
+        raise ValueError("Unexpected MODIS requested period metadata")
+    fill_key = "Fill Value (mean_MODISA_L3m_SST_Monthly_4km_R2019_0_sst)"
+    if float(metadata.get(fill_key, "nan")) != -32767:
+        raise ValueError(f"Unexpected MODIS fill value metadata: {metadata.get(fill_key)!r}")
+
+    reader = csv.DictReader(lines[header_index:])
+    if reader.fieldnames is not None:
+        reader.fieldnames = [name.strip() for name in reader.fieldnames]
+    value_key = "mean_MODISA_L3m_SST_Monthly_4km_R2019_0_sst"
+    if reader.fieldnames != ["time", value_key]:
+        raise ValueError(f"Unexpected MODIS columns: {reader.fieldnames!r}")
+
+    points: list[dict[str, Any]] = []
+    raw_dates: list[date] = []
+    for row in reader:
+        raw_time = (row.get("time") or "").strip()
+        raw_value = (row.get(value_key) or "").strip()
+        if not raw_time and not raw_value:
+            continue
+        if not raw_time or not raw_value:
+            raise ValueError(f"Incomplete MODIS row: {row!r}")
+        timestamp = date.fromisoformat(raw_time[:10])
+        try:
+            value = float(raw_value)
+        except ValueError as error:
+            raise ValueError(f"Non-numeric MODIS SST on {raw_time}: {raw_value!r}") from error
+        if not math.isfinite(value) or value == -32767:
+            raise ValueError(f"Missing/fill MODIS SST on {raw_time}: {value}")
+        raw_dates.append(timestamp)
+        month = date(timestamp.year, timestamp.month, 1)
+        points.append({
+            "date": month.strftime("%Y-%m"),
+            "year": month.year,
+            "month": month.month,
+            "value": value,
+        })
+
+    expected = expected_months(2002, 8, 281)
+    months = [(point["year"], point["month"]) for point in points]
+    if len(points) != 281 or months != expected or len(set(months)) != 281:
+        duplicate_count = len(months) - len(set(months))
+        missing_count = len(set(expected) - set(months))
+        raise ValueError(f"MODIS must have 281 continuous unique months Aug 2002–Dec 2025; got {len(points)}, duplicates={duplicate_count}, missing={missing_count}")
+    if any(raw_date.year == 2002 and raw_date.month == 7 for raw_date in raw_dates):
+        raise ValueError("MODIS unexpectedly contains a July 2002 observation")
+    return points, raw_dates
 
 
 def read_oras5() -> tuple[list[dict[str, Any]], str]:
@@ -95,7 +164,8 @@ def ts_array(interface: str, name: str, rows: list[dict[str, Any]], metadata: li
     return f"{comments}\n\nexport interface {interface} {{\n  date: string;\n  {('day: number;\n  precipitation: number;' if interface == 'DailyRainfallPoint' else 'year: number;\n  month: number;\n  value: number;')}\n}}\n\nexport const {name}: {interface}[] = {body};\n"
 
 
-def validate_and_render() -> tuple[str, str, str, list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+def validate_and_render() -> tuple[str, str, str, str, list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]], list[date]]:
+    modis_points, modis_raw_dates = read_modis_aqua_monthly()
     daily_rows = read_giovanni(RAIN_2026)
     daily_dates = [row["date"] for row in daily_rows]
     expected_days = [date(2026, 9, day) for day in range(1, 31)]
@@ -165,15 +235,33 @@ def validate_and_render() -> tuple[str, str, str, list[dict[str, Any]], list[dic
         "  date: string;\n  year: number;\n  value: number;\n  observationCount: number;\n}\n\n"
         f"export const pacificSeptemberBaselineMeans: AnnualSeptemberRainfallMeanPoint[] = {september_body};\n"
     )
-    return rainfall_ts, oras_ts, september_ts, rainfall_points, thermocline_points, september_annual_means
+    modis_body = json.dumps(modis_points, ensure_ascii=False, indent=2, allow_nan=False)
+    modis_ts = (
+        "// Generated from the preserved NASA Giovanni MODIS Aqua CSV by scripts/extractChartData.py.\n"
+        "// Original varying day-of-month timestamps are reduced to YYYY-MM before charting and trend analysis.\n"
+        "export interface ModisAquaSstPoint {\n"
+        "  date: string;\n  year: number;\n  month: number;\n  value: number;\n}\n\n"
+        f"export const modisAquaMonthlySst: ModisAquaSstPoint[] = {modis_body};\n\n"
+        "export const modisAquaSstMetadata = {\n"
+        "  classification: \"ABSOLUTE SST\",\n"
+        "  variable: \"Sea Surface Temperature at 11 microns (Day)\",\n"
+        "  product: \"MODISA_L3m_SST_Monthly_4km_R2019_0_sst\",\n"
+        "  units: \"°C\",\n"
+        "  source: \"NASA Giovanni · MODIS Aqua monthly Level 3\",\n"
+        "  spatialDomain: \"Niño-3.4 box 170°W–120°W, 5°S–5°N\",\n"
+        "  period: \"Aug 2002–Dec 2025 · 281 monthly observations\",\n"
+        "  interpretation: \"Absolute SST, not an anomaly\",\n"
+        "} as const;\n"
+    )
+    return rainfall_ts, oras_ts, september_ts, modis_ts, rainfall_points, thermocline_points, september_annual_means, modis_points, modis_raw_dates
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Reproduce typed chart series from the preserved CSV and XLSX sources.")
     parser.add_argument("--check", action="store_true", help="Validate sources and ensure generated modules are up to date without writing files.")
     args = parser.parse_args()
-    rainfall_ts, oras_ts, september_ts, rainfall_points, thermocline_points, september_annual_means = validate_and_render()
-    outputs = ((PACIFIC_OUT, rainfall_ts), (ORAS5_OUT, oras_ts), (PACIFIC_BASELINE_OUT, september_ts))
+    rainfall_ts, oras_ts, september_ts, modis_ts, rainfall_points, thermocline_points, september_annual_means, modis_points, modis_raw_dates = validate_and_render()
+    outputs = ((PACIFIC_OUT, rainfall_ts), (ORAS5_OUT, oras_ts), (PACIFIC_BASELINE_OUT, september_ts), (MODISA_OUT, modis_ts))
     if args.check:
         stale = [path.relative_to(ROOT).as_posix() for path, expected in outputs if not path.exists() or path.read_text(encoding="utf-8-sig") != expected]
         if stale:
@@ -193,6 +281,7 @@ def main() -> int:
     print(f"  September annual means: {len(september_annual_means)} computed points, {september_annual_means[0]['date']} through {september_annual_means[-1]['date']}; 30 daily observations per mean")
     print(f"  ORAS5: {len(thermocline_points)} monthly observations, {thermocline_points[0]['date']} through {thermocline_points[-1]['date']}; 815 unique continuous dates; no missing/non-numeric values")
     print("  ORAS5 location: 0°N, 110°W for all rows; unit remains unconfirmed")
+    print(f"  MODIS Aqua absolute SST: {len(modis_points)} observations; raw dates {modis_raw_dates[0]} through {modis_raw_dates[-1]}; normalized months {modis_points[0]['date']} through {modis_points[-1]['date']}; unique continuous months; no July 2002 observation; no fill/non-numeric values")
     print(f"  Result: {action}.")
     return 0
 

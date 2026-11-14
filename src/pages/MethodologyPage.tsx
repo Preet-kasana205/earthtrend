@@ -69,7 +69,26 @@ export function MethodologyPage() {
       </article>
 
       <article className="method-chapter safeguard-chapter surface-raised surface-pad">
-        <div className="chapter-kicker"><span>04</span><div className="eyebrow">Interpretation safeguards</div></div>
+        <div className="chapter-kicker"><span>04</span><div className="eyebrow">NASA MODIS Aqua absolute sea surface temperature</div></div>
+        <h3>Monthly daytime 11-micron SST, kept separate from anomalies</h3>
+        <p className="method-lead">The MODIS Aqua Level 3 monthly 4 km source provides daytime sea surface temperature at 11 microns for the Niño-3.4 box. The CSV has varying full-day timestamps; extraction converts each timestamp to its YYYY-MM month before charts and trend analysis. The plotted and tested variable is absolute SST in °C, not an anomaly.</p>
+        <div className="method-definition-grid">
+          <div><span>Variable</span><strong>Sea Surface Temperature at 11 microns (Day) · ABSOLUTE SST</strong></div>
+          <div><span>Product</span><strong>MODISA_L3m_SST_Monthly_4km_R2019_0_sst</strong></div>
+          <div><span>Region</span><strong>170°W–120°W · 5°S–5°N</strong></div>
+          <div><span>Period / unit</span><strong>Aug 2002–Dec 2025 · 281 months · °C</strong></div>
+        </div>
+        <div className="formula-block" aria-label="MODIS Aqua trend method">
+          <div className="formula-heading"><Activity size={15} />Computed from all month-normalized observations</div>
+          <div className="formula-line"><span>Slope</span><code>Shared Theil–Sen engine · annualized by elapsed calendar time</code></div>
+          <div className="formula-line"><span>Test</span><code>Shared two-sided Mann–Kendall · tie-corrected variance · continuity correction · α = 0.05</code></div>
+          <div className="formula-line formula-result"><span>Caveat</span><code>No seasonal stratification or serial-autocorrelation correction; ENSO variability dominates over this 23-year record.</code></div>
+        </div>
+        <div className="method-source"><Database size={14} /><span>The MODIS absolute SST trend is separate from the two NOAA CPC monthly Niño-3.4 anomaly values. Those CPC values (+2.1°C in September and +2.5°C in October 2026) use their own ERSST 1991–2020 baseline and are too few for a trend test.</span></div>
+      </article>
+
+      <article className="method-chapter safeguard-chapter surface-raised surface-pad">
+        <div className="chapter-kicker"><span>05</span><div className="eyebrow">Interpretation safeguards</div></div>
         <h3>Keep labels tied to the underlying variable</h3>
         <div className="safeguard-list">
           <div><span className="safeguard-marker">A</span><div><strong>Monthly Niño-3.4 anomaly is not ONI</strong><p>Monthly SST anomaly values are labelled as monthly Niño-3.4 anomalies. ONI is a three-month running index. Significance is not assessed: the September and October values are only two monthly observations, too short for a trend test.</p></div></div>
@@ -79,7 +98,7 @@ export function MethodologyPage() {
           <div><span className="safeguard-marker">E</span><div><strong>GLDAS trends do not rule out droughts</strong><p>A trend in monthly soil moisture or a rising annual mean does not show that droughts were absent. The standard Mann–Kendall test here does not correct for serial autocorrelation.</p></div></div>
           <div><span className="safeguard-marker">F</span><div><strong>Monsoon percentages are descriptive</strong><p>The four June–September percentages compare one season with the LPA. They are seasonal percentages, not a comparable multi-year time series for trend testing.</p></div></div>
         </div>
-        <div className="method-source"><ShieldAlert size={14} /><span>Trend tests are documented for GLDAS, ORAS5 and annual September baseline means. No test is run on the two-month Niño-3.4 record or the single-season monsoon percentages.</span></div>
+        <div className="method-source"><ShieldAlert size={14} /><span>Trend tests are documented for GLDAS, ORAS5, MODIS Aqua absolute SST and annual September baseline means. No test is run on the two-month CPC Niño-3.4 anomaly record or the single-season monsoon percentages.</span></div>
       </article>
 
       <section className="reproduction-panel surface surface-pad">
@@ -87,7 +106,7 @@ export function MethodologyPage() {
         <div className="code-steps"><code><span>1</span> python -m pip install -r requirements-extraction.txt</code><code><span>2</span> npm run data:extract</code><code><span>3</span> npm run data:check</code></div>
       </section>
 
-      <ScientificCaveat significanceNotAssessed={false}>GLDAS, ORAS5 and annual September baseline means have documented trend tests. The two-month Niño-3.4 series and the one-season monsoon percentages are not tested for significance for the reasons shown above.</ScientificCaveat>
+      <ScientificCaveat significanceNotAssessed={false}>GLDAS, ORAS5, MODIS Aqua absolute SST and annual September baseline means have documented trend tests. The two-month CPC Niño-3.4 anomaly series and the one-season monsoon percentages are not tested for significance for the reasons shown above.</ScientificCaveat>
     </section>
   );
 }

@@ -14,6 +14,7 @@ export interface TrendAnalysis {
 export interface TrendDirectionLabels {
   positive: string;
   negative: string;
+  notSignificant?: string;
 }
 
 const DEFAULT_DIRECTION_LABELS: TrendDirectionLabels = {
@@ -107,7 +108,9 @@ export function analyzeTrend(
       : null;
   const significanceLabel = direction === null
     ? "No significant trend"
-    : `${p < SIGNIFICANCE_LEVEL ? "Significant" : "Not significant"} ${direction}`;
+    : p >= SIGNIFICANCE_LEVEL && directionLabels.notSignificant
+      ? directionLabels.notSignificant
+      : `${p < SIGNIFICANCE_LEVEL ? "Significant" : "Not significant"} ${direction}`;
 
   return { senSlopePerYear, mannKendallS: s, zScore, mannKendallP: p, significanceLabel };
 }
