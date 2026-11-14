@@ -1,0 +1,12 @@
+.trend-page { gap:16px; }
+.trend-observation-count { display:flex; align-items:center; gap:8px; padding:9px 11px; border:1px solid #1d3e50; border-radius:9px; background:#0d202c; color:#72d5df; font:500 9px var(--mono); white-space:nowrap; }
+.trend-context-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.trend-context-card { display:flex; flex-direction:column; align-items:flex-start; gap:9px; }
+.trend-context-card h3 { margin:0; color:#e4edf8; font-size:14px; font-weight:600; }
+.trend-context-card p { margin:0; color:#91a3ba; font-size:11px; line-height:1.65; }
+.trend-context-card .data-badge { margin-top:auto; }
+.context-icon { display:grid; place-items:center; width:32px; height:32px; border:1px solid currentColor; border-radius:9px; }
+.context-icon.cyan { color:#57cfe0; background:#102a37; }
+.context-icon.teal { color:#56d2bf; background:#102b2d; }
+.context-source { margin:2px 0 3px; color:#657c96; font:400 8px var(--mono); }
+@media(max-width:700px) { .trend-observation-count { margin-top:4px; } .trend-context-grid { grid-template-columns:1fr; } }

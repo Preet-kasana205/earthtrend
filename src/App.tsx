@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import {
   Activity,
   BookOpenCheck,
@@ -13,17 +13,18 @@ import {
   X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { OverviewPage } from "./pages/OverviewPage";
-import { TrendExplorerPage } from "./pages/TrendExplorerPage";
-import { RelationshipsPage } from "./pages/RelationshipsPage";
-import { IndiaMonsoonPage } from "./pages/IndiaMonsoonPage";
-import { DatasetsPage } from "./pages/DatasetsPage";
-import { MethodologyPage } from "./pages/MethodologyPage";
-import { Phase3Page } from "./pages/Phase3Page";
 import "./App.css";
 
 type PageId = "overview" | "trend" | "relationships" | "monsoon" | "datasets" | "methodology" | "phase3";
 type NavItem = { id: PageId; label: string; badge: string; icon: LucideIcon };
+
+const OverviewPage = lazy(() => import("./pages/OverviewPage").then((module) => ({ default: module.OverviewPage })));
+const TrendExplorerPage = lazy(() => import("./pages/TrendExplorerPage").then((module) => ({ default: module.TrendExplorerPage })));
+const RelationshipsPage = lazy(() => import("./pages/RelationshipsPage").then((module) => ({ default: module.RelationshipsPage })));
+const IndiaMonsoonPage = lazy(() => import("./pages/IndiaMonsoonPage").then((module) => ({ default: module.IndiaMonsoonPage })));
+const DatasetsPage = lazy(() => import("./pages/DatasetsPage").then((module) => ({ default: module.DatasetsPage })));
+const MethodologyPage = lazy(() => import("./pages/MethodologyPage").then((module) => ({ default: module.MethodologyPage })));
+const Phase3Page = lazy(() => import("./pages/Phase3Page").then((module) => ({ default: module.Phase3Page })));
 
 const pages: NavItem[] = [
   { id: "overview", label: "Overview", badge: "01", icon: LayoutDashboard },
@@ -66,45 +67,32 @@ export default function App() {
             </button>
           ))}
         </nav>
-        <div className="sidebar-bottom">
-          <span className="status-dot" aria-hidden="true" />
-          {!collapsed && <span>Verified Source Data</span>}
-        </div>
+        <div className="sidebar-bottom"><span className="status-dot" aria-hidden="true" />{!collapsed && <span>Verified Source Data</span>}</div>
       </aside>
-
       {mobileMenuOpen && <button className="sidebar-scrim" type="button" aria-label="Close navigation" onClick={() => setMobileMenuOpen(false)} />}
 
       <div className="main-panel">
         <header className="topbar">
           <div className="topbar-heading">
-            <button className="icon-button mobile-menu-button" type="button" onClick={() => setMobileMenuOpen((value) => !value)} aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}>
-              {mobileMenuOpen ? <X size={19} /> : <Menu size={19} />}
-            </button>
-            <div>
-              <div className="breadcrumb"><span>EarthTrend</span><span className="breadcrumb-separator">/</span><span>{activePage.label}</span></div>
-              <h1>{activePage.label}</h1>
-            </div>
+            <button className="icon-button mobile-menu-button" type="button" onClick={() => setMobileMenuOpen((value) => !value)} aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}>{mobileMenuOpen ? <X size={19} /> : <Menu size={19} />}</button>
+            <div><div className="breadcrumb"><span>EarthTrend</span><span className="breadcrumb-separator">/</span><span>{activePage.label}</span></div><h1>{activePage.label}</h1></div>
           </div>
           <div className="topbar-status"><span className="status-dot" /><span>Verified Source Data</span></div>
         </header>
-
         <main className="page-main mx-auto w-full max-w-7xl px-4 pb-10 pt-6 sm:px-6 lg:px-8">
-          {page === "overview" && <OverviewPage onNavigate={navigate} />}
-          {page === "trend" && <TrendExplorerPage />}
-          {page === "relationships" && <RelationshipsPage />}
-          {page === "monsoon" && <IndiaMonsoonPage />}
-          {page === "datasets" && <DatasetsPage />}
-          {page === "methodology" && <MethodologyPage />}
-          {page === "phase3" && <Phase3Page />}
+          <Suspense fallback={<div className="surface surface-pad page-loading">Loading page…</div>}>
+            {page === "overview" && <OverviewPage onNavigate={navigate} />}
+            {page === "trend" && <TrendExplorerPage />}
+            {page === "relationships" && <RelationshipsPage onNavigate={() => navigate("methodology")} />}
+            {page === "monsoon" && <IndiaMonsoonPage />}
+            {page === "datasets" && <DatasetsPage />}
+            {page === "methodology" && <MethodologyPage />}
+            {page === "phase3" && <Phase3Page />}
+          </Suspense>
         </main>
-
-        <footer className="site-footer">
-          <div className="footer-inner mx-auto flex w-full max-w-7xl flex-col gap-2 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-            <span>EarthTrend · NASA Space Apps Challenge · 14–15 November 2026</span>
-            <span>Sources: NOAA CPC · NASA Giovanni · IMD · BoM · ECMWF ORAS5</span>
-          </div>
-        </footer>
+        <footer className="site-footer"><div className="footer-inner mx-auto flex w-full max-w-7xl flex-col gap-2 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8"><span>EarthTrend · NASA Space Apps Challenge · 14–15 November 2026</span><span>Sources: NOAA CPC · NASA Giovanni · IMD · BoM · ECMWF ORAS5</span></div></footer>
       </div>
     </div>
   );
 }
+

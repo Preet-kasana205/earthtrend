@@ -1,98 +1,66 @@
-import React from "react";
-import { nino34 } from "../data/realData";
+import "../relationships.css";
+import { ArrowRight, BookOpenText, CircleHelp, Globe2, Thermometer, Waves } from "lucide-react";
 import { ScientificCaveat } from "../components/ScientificCaveat";
+import { iod, monsoon2026, nino34, pacificRainfall, thermocline } from "../data/realData";
 
-export const RelationshipsPage: React.FC = () => {
+export function RelationshipsPage({ onNavigate }: { onNavigate: () => void }) {
   return (
-    <section>
-      <h2 style={{ fontSize: "24px", color: "#f3f4f6", margin: "0 0 16px 0" }}>
-        Earth System Relationships & Teleconnections
-      </h2>
-
-      {/* Primary Physical Interconnections */}
-      <div style={{ background: "#111827", padding: "20px", borderRadius: "12px", border: "1px solid #1f2937", marginBottom: "20px" }}>
-        <h3 style={{ margin: "0 0 12px 0", color: "#60a5fa", fontSize: "18px" }}>
-          Observed Co-Occurrences in the Equatorial Pacific
-        </h3>
-        <p style={{ color: "#d1d5db", lineHeight: 1.6, marginBottom: "16px" }}>
-          In late 2026, multiple independent physical observations co-occur in the equatorial Pacific basin:
-        </p>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "14px", marginBottom: "16px" }}>
-          <div style={{ background: "#1f2937", padding: "16px", borderRadius: "8px", borderTop: "3px solid #f87171" }}>
-            <b style={{ color: "#f87171", fontSize: "15px" }}>Surface SST Warming</b>
-            <p style={{ color: "#d1d5db", fontSize: "13px", marginTop: "6px" }}>
-              Niño-3.4 monthly anomaly increased from +{nino34.sep2026Monthly}°C (Sep) to +{nino34.oct2026Monthly}°C (Oct).
-            </p>
-          </div>
-          <div style={{ background: "#1f2937", padding: "16px", borderRadius: "8px", borderTop: "3px solid #60a5fa" }}>
-            <b style={{ color: "#60a5fa", fontSize: "15px" }}>Deep Atmospheric Convection</b>
-            <p style={{ color: "#d1d5db", fontSize: "13px", marginTop: "6px" }}>
-              Niño-3.4 box daily rainfall reached 4.43 mm/day (+3.76 mm/day anomaly over September 2001–2019 baseline).
-            </p>
-          </div>
-          <div style={{ background: "#1f2937", padding: "16px", borderRadius: "8px", borderTop: "3px solid #38bdf8" }}>
-            <b style={{ color: "#38bdf8", fontSize: "15px" }}>Subsurface Ocean Heat</b>
-            <p style={{ color: "#d1d5db", fontSize: "13px", marginTop: "6px" }}>
-              Upper 300m eastern half at +3.32°C, subsurface thermal anomalies exceeding +10°C at depth (NOAA CPC).
-            </p>
-          </div>
-        </div>
-
-        <div style={{ background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.3)", padding: "14px", borderRadius: "8px", color: "#fca5a5", fontSize: "14px" }}>
-          <b>Vital Epistemic Distinction:</b> While these conditions physically align with classic strong El Niño atmospheric and oceanic coupling, they represent <b>observed associations</b>. Co-occurrence in an empirical record does not constitute statistical or causal proof that one variable mechanically produced the others in isolation.
-        </div>
+    <section className="page-section relationship-page">
+      <div className="page-intro">
+        <div><div className="eyebrow">Evidence before explanation</div><h2>How the observations relate</h2><p>Compare observations and agency assessments while keeping their periods, variables, and limits distinct.</p></div>
+        <span className="badge"><span className="badge-dot" />No significance test reported</span>
       </div>
 
-      {/* The IOD Split & Indian Teleconnections */}
-      <div style={{ background: "#111827", padding: "20px", borderRadius: "12px", border: "1px solid #1f2937", marginBottom: "20px" }}>
-        <h3 style={{ margin: "0 0 12px 0", color: "#fbbf24", fontSize: "18px" }}>
-          Indian Ocean Dipole (IOD) Discrepancy & India Teleconnections
-        </h3>
-        <p style={{ color: "#d1d5db", lineHeight: 1.6, marginBottom: "12px" }}>
-          For India's monsoon circulation, the Indian Ocean Dipole plays a pivotal modulating role. However, international meteorological agencies present differing diagnostic verdicts for late 2026:
-        </p>
-
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", margin: "16px 0" }}>
-          <div style={{ background: "#1f2937", padding: "16px", borderRadius: "8px" }}>
-            <span style={{ fontSize: "12px", color: "#9ca3af", textTransform: "uppercase" }}>Australian Bureau of Meteorology (BoM)</span>
-            <div style={{ fontSize: "20px", fontWeight: "bold", color: "#fbbf24", margin: "6px 0" }}>Positive IOD (+0.75°C)</div>
-            <p style={{ fontSize: "13px", color: "#d1d5db", margin: 0 }}>
-              Sustained index exceedance above the +0.4°C threshold for the week to 8 Nov 2026; positive IOD event declared.
-            </p>
-          </div>
-          <div style={{ background: "#1f2937", padding: "16px", borderRadius: "8px" }}>
-            <span style={{ fontSize: "12px", color: "#9ca3af", textTransform: "uppercase" }}>India Meteorological Department (IMD)</span>
-            <div style={{ fontSize: "20px", fontWeight: "bold", color: "#60a5fa", margin: "6px 0" }}>Neutral IOD</div>
-            <p style={{ fontSize: "13px", color: "#d1d5db", margin: 0 }}>
-              Assessment as of 31 Oct 2026; IMD operational forecast models indicate neutral conditions prevailing through December 2026.
-            </p>
-          </div>
+      <section className="relationship-story surface surface-pad">
+        <div className="story-heading"><div className="story-icon"><Globe2 size={19} /></div><div><div className="eyebrow">Pacific observations</div><h3>Several records describe different parts of the system</h3></div></div>
+        <div className="observation-list">
+          <article className="observation-row">
+            <div className="observation-symbol rose"><Thermometer size={17} /></div>
+            <div className="observation-main"><div className="observation-title">Monthly Niño-3.4 sea-surface temperature anomaly</div><p>+{nino34.sep2026Monthly}°C in September and +{nino34.oct2026Monthly}°C in October 2026, relative to the {nino34.baseline} baseline.</p></div>
+            <div className="observation-meta">NOAA CPC<br />ERSST v5</div>
+          </article>
+          <article className="observation-row">
+            <div className="observation-symbol cyan"><Waves size={17} /></div>
+            <div className="observation-main"><div className="observation-title">Daily area-averaged rainfall rate</div><p>{pacificRainfall.sep2026Mean} mm/day in September 2026, compared with a {pacificRainfall.sepBaselineMean} mm/day September mean for 2001–2019.</p></div>
+            <div className="observation-meta">NASA Giovanni<br />GPM IMERG v07</div>
+          </article>
+          <article className="observation-row">
+            <div className="observation-symbol teal"><Waves size={17} /></div>
+            <div className="observation-main"><div className="observation-title">ORAS5 isotherm-depth source values</div><p>A historical monthly series ends in November 2025. It is not contemporaneous with the 2026 records and its units remain unconfirmed.</p></div>
+            <div className="observation-meta">ECMWF ORAS5<br />1958–2025</div>
+          </article>
+          <article className="observation-row">
+            <div className="observation-symbol violet"><Thermometer size={17} /></div>
+            <div className="observation-main"><div className="observation-title">CPC subsurface temperature anomalies</div><p>{thermocline.cpcOct2026Update}. This is a temperature anomaly, a separate variable from ORAS5 isotherm depth.</p></div>
+            <div className="observation-meta">NOAA CPC<br />October 2026</div>
+          </article>
         </div>
+        <div className="relationship-footnote"><CircleHelp size={14} />Different variables and time windows should not be merged into a single measured series.</div>
+      </section>
 
-        <div style={{ background: "#1f2937", padding: "14px", borderRadius: "8px", fontSize: "13px", color: "#e5e7eb", lineHeight: 1.6 }}>
-          <p style={{ margin: "0 0 8px 0" }}>
-            <b>Why Neither Agency Is Wrong:</b> BoM and IMD use slightly different spatial bounding boxes, baseline periods, SST datasets, and threshold duration requirements. Divergence between operational centers reflects genuine differences in analytical frameworks.
-          </p>
-          <p style={{ margin: 0, color: "#fca5a5" }}>
-            <b>Critical Monsoon Nuance:</b> A positive IOD is <b>not</b> a blanket guarantee of favorable rainfall for India, nor does it offset an El Niño deficit uniformly across all meteorological subdivisions. Furthermore, a positive IOD does <b>not</b> explain catastrophic localized flooding in Assam, northern river basins, or coastal Andhra Pradesh on its own; localized floods are governed by synoptic convective systems and regional orography.
-          </p>
+      <section className="iod-compare surface surface-pad">
+        <div className="story-heading"><div className="story-icon amber"><Globe2 size={19} /></div><div><div className="eyebrow">Indian Ocean Dipole</div><h3>Two agency assessments, reported with their dates</h3></div></div>
+        <div className="agency-compare">
+          <article className="agency-panel bom-panel"><div className="agency-heading">Australian Bureau of Meteorology <span>BoM</span></div><div className="agency-reading">Positive <strong>+{iod.bomWeeklyTo8Nov2026}°C</strong></div><p>{iod.bomPeriod}</p><small>Weekly Dipole Mode Index assessment</small></article>
+          <div className="agency-separator"><span>VS</span><i /></div>
+          <article className="agency-panel imd-panel"><div className="agency-heading">India Meteorological Department <span>IMD</span></div><div className="agency-reading">{iod.imdStatus31Oct2026.split(",")[0]} <strong>IOD</strong></div><p>Assessment: {iod.imdDate}</p><small>Assessment and outlook as reported by IMD</small></article>
         </div>
-      </div>
+        <div className="iod-note"><BookOpenText size={15} /><span>{iod.note} Assessment dates differ, so both are shown with their reporting periods.</span></div>
+      </section>
 
-      {/* No Demo P-Values & Strict Safeguards */}
-      <div style={{ background: "#111827", padding: "20px", borderRadius: "12px", border: "1px solid #1f2937" }}>
-        <h3 style={{ margin: "0 0 8px 0", color: "#9ca3af", fontSize: "16px" }}>
-          Analytical Integrity & Statistical Verification
-        </h3>
-        <p style={{ color: "#d1d5db", fontSize: "14px", lineHeight: 1.6 }}>
-          This platform intentionally omits synthetic correlation coefficients and demo p-values. No formal multi-decadal hypothesis testing has been computed on these specific single-season headline metrics. To claim mathematical statistical significance without a rigorous published test is unscientific.
-        </p>
-      </div>
+      <section className="relationship-interpretation surface-raised surface-pad">
+        <div className="eyebrow">Reading the evidence</div>
+        <h3>What this comparison does — and does not — establish</h3>
+        <div className="interpretation-columns">
+          <div><span className="interpretation-number">01</span><p>These values are observations or agency assessments, each with its own source, variable, and date.</p></div>
+          <div><span className="interpretation-number">02</span><p>The monsoon seasonal total is reported separately: {monsoon2026.percentOfLPA}% of the 1971–2020 LPA for June–September 2026.</p></div>
+          <div><span className="interpretation-number">03</span><p>No formal statistical relationship or causal test is reported here. Co-occurrence alone does not establish one.</p></div>
+        </div>
+        <button className="text-link" type="button" onClick={onNavigate}>Read the calculation and caveats <ArrowRight size={14} /></button>
+      </section>
 
-      <ScientificCaveat significanceNotAssessed={true}>
-        Significance not assessed: No p-values or significance levels are asserted. Correlation does not prove causation.
-      </ScientificCaveat>
+      <ScientificCaveat>Significance not assessed. No p-values or formal hypothesis test are presented on this page.</ScientificCaveat>
     </section>
   );
-};
+}
+
