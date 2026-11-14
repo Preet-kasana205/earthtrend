@@ -1,7 +1,7 @@
 import "../overview.css";
 import { ArrowUpRight, Database, Globe2, MapPin, MoveRight } from "lucide-react";
 import { StatCard } from "../components/StatCard";
-import { PacificSchematicMap } from "../components/PacificSchematicMap";
+import { InteractiveOverviewMap } from "../components/InteractiveOverviewMap";
 import { ScientificCaveat } from "../components/ScientificCaveat";
 import { PageFinding, PageSummary } from "../components/PageFinding";
 import { iod, monsoon2026, nino34, pacificRainfall } from "../data/realData";
@@ -9,6 +9,7 @@ import { gldasSoilMoisture } from "../data/gldasSoilMoistureData";
 import { modisAquaMonthlySst } from "../data/modisAquaSstData";
 import { oras5ThermoclineData } from "../data/oras5ThermoclineData";
 import { analyzeTrend } from "../lib/trendAnalysis";
+import type { TrendSelection } from "../lib/overviewMapRegions.js";
 
 type PageId = "overview" | "trend" | "relationships" | "monsoon" | "datasets" | "methodology" | "phase3";
 
@@ -28,7 +29,7 @@ function KeyFindingCard({ value, result, meaning, onClick }: { value: string; re
   return <article className="key-finding-card surface"><span className="key-finding-value mono">{value}</span><strong>{result}</strong><p>{meaning}</p><button className="text-link" type="button" onClick={onClick}>See supporting page <ArrowUpRight size={14} /></button></article>;
 }
 
-export function OverviewPage({ onNavigate }: { onNavigate: (page: PageId) => void }) {
+export function OverviewPage({ onNavigate }: { onNavigate: (page: PageId, selection?: TrendSelection) => void }) {
   return (
     <section className="page-section overview-page">
       <PageSummary>Verified climate observations, historical trends, and their stated baselines are brought together here with source links and scientific limits in view.</PageSummary>
@@ -70,8 +71,15 @@ export function OverviewPage({ onNavigate }: { onNavigate: (page: PageId) => voi
         </div>
       </section>
 
-      <div className="map-layout">
-        <PacificSchematicMap />
+      <div className="map-layout overview-map-layout">
+        <InteractiveOverviewMap
+          findings={{
+            "Niño-3.4": `+${nino34.oct2026Monthly}°C October 2026 monthly SST anomaly. Significance not assessed.`,
+            Rajasthan: `${rajasthanTrend.senSlopePerYear > 0 ? "+" : ""}${rajasthanTrend.senSlopePerYear.toFixed(6)} kg/m²/year · ${rajasthanTrend.significanceLabel} · Mann–Kendall p = ${rajasthanTrend.mannKendallP.toFixed(6)}`,
+            Assam: `${assamTrend.senSlopePerYear > 0 ? "+" : ""}${assamTrend.senSlopePerYear.toFixed(6)} kg/m²/year · ${assamTrend.significanceLabel} · Mann–Kendall p = ${assamTrend.mannKendallP.toFixed(6)}`,
+          }}
+          onNavigate={(selection) => onNavigate("trend", selection)}
+        />
         <aside className="map-context surface surface-pad">
           <div className="eyebrow">Region at a glance</div>
           <h3>Niño-3.4 reference area</h3>
