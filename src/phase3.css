@@ -1,0 +1,39 @@
+.phase3-page { gap:16px; }
+.prepared-banner { display:flex; align-items:center; gap:15px; padding:22px; border:1px solid #245347; border-radius:15px; background:radial-gradient(ellipse at 12% 50%,#16443855,transparent 40%),linear-gradient(110deg,#10272a,#102333); }
+.prepared-symbol { display:grid; place-items:center; flex:0 0 52px; width:52px; height:52px; border:1px solid #2d776b; border-radius:15px; background:#123c3a; color:#65e2c5; }
+.prepared-banner h2 { margin:7px 0 5px; color:#e8f7f2; font-size:25px; font-weight:600; letter-spacing:-.04em; }
+.prepared-banner p { max-width:750px; margin:0; color:#93b6b2; font-size:10px; line-height:1.65; }
+.prepared-status { margin-left:auto; padding:7px 9px; border:1px solid #3e695b; border-radius:7px; color:#a6e4cd; font:600 8px var(--mono); white-space:nowrap; }
+.official-guidance { display:grid; gap:15px; }
+.guidance-heading { display:flex; justify-content:space-between; align-items:center; }
+.guidance-heading h3 { margin-top:5px; }
+.prepared-icon { display:grid; place-items:center; width:36px; height:36px; border:1px solid #294760; border-radius:10px; background:#122439; color:#73cddd; }
+.guidance-links { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; }
+.guidance-links a { display:flex; align-items:center; justify-content:space-between; gap:9px; min-height:52px; padding:11px 12px; border:1px solid #29445f; border-radius:9px; background:#0d1a29; color:#b9d8e4; font-size:9px; font-weight:500; text-decoration:none; transition:.18s ease; }
+.guidance-links a:hover { border-color:#3b8290; background:#10283a; color:#e1faff; }
+.guidance-links a svg { flex:0 0 auto; color:#52c6d5; }
+.learning-section { display:grid; gap:10px; padding:3px 0; }
+.learning-heading { display:flex; align-items:end; justify-content:space-between; gap:15px; }
+.learning-heading h3 { margin:4px 0 0; color:#e4edf8; font-size:16px; font-weight:600; }
+.learning-audience { display:flex; align-items:center; gap:6px; color:#7b93aa; font:500 8px var(--mono); }
+.learning-list { display:grid; margin:0; padding:0; list-style:none; border-top:1px solid #21344c; }
+.learning-list li { display:grid; grid-template-columns:40px minmax(0,1fr) 20px; align-items:center; gap:12px; padding:14px 10px; border-bottom:1px solid #21344c; transition:background .18s ease; }
+.learning-list li:hover { background:#101c2b; }
+.learning-number { display:grid; place-items:center; width:29px; height:29px; border:1px solid #2b4a5d; border-radius:8px; color:#70d2d8; font:600 9px var(--mono); }
+.learning-list strong { color:#dce8f3; font-size:10px; }
+.learning-list p { margin:4px 0 0; color:#879bb1; font-size:9px; line-height:1.5; }
+.learning-arrow { color:#617b93; font-size:14px; text-align:center; }
+.impact-section { display:grid; gap:10px; }
+.impact-section h3 { margin-top:1px; }
+.impact-strip { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; margin-top:6px; }
+.impact-strip > div { display:grid; gap:7px; padding:12px; border:1px solid #2a3c50; border-radius:9px; background:#0d1928; }
+.impact-strip span { color:#7e91a8; font:500 8px var(--mono); text-transform:uppercase; }
+.impact-strip strong { color:#eccb70; font:600 19px var(--mono); letter-spacing:-.05em; }
+.cyclone-context { padding-top:12px; border-top:1px solid #23364d; }
+.cyclone-context > strong { color:#9aacc0; font:600 8px var(--mono); text-transform:uppercase; letter-spacing:.06em; }
+.cyclone-context ul { display:grid; gap:6px; margin:9px 0 0; padding:0; list-style:none; }
+.cyclone-context li { display:grid; grid-template-columns:150px 1fr; gap:10px; color:#9aabc0; font-size:9px; line-height:1.5; }
+.cyclone-context li span:first-child { color:#d8e4f0; font-weight:600; }
+.video-note { display:flex; align-items:center; gap:12px; }
+.video-note p { margin:5px 0 0; color:#879bb0; font-size:9px; line-height:1.6; }
+@media(max-width:680px) { .prepared-banner { align-items:flex-start; flex-wrap:wrap; } .prepared-status { margin-left:67px; } .guidance-links { grid-template-columns:1fr; } .learning-heading { align-items:flex-start; flex-direction:column; } .impact-strip { grid-template-columns:1fr; } .cyclone-context li { grid-template-columns:1fr; gap:2px; } }
