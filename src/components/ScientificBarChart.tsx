@@ -1,3 +1,4 @@
+import "../charts.css";
 import { Bar, BarChart, CartesianGrid, Cell, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 export interface BarChartPoint {
@@ -16,9 +17,10 @@ interface ScientificBarChartProps {
   color?: string;
   baseline?: { value: number; label: string };
   valueDigits?: number;
+  highlightIndex?: number;
 }
 
-export function ScientificBarChart({ data, title, seriesLabel, units, source, period, caveat, color = "#14b8a6", baseline, valueDigits = 1 }: ScientificBarChartProps) {
+export function ScientificBarChart({ data, title, seriesLabel, units, source, period, caveat, color = "#14b8a6", baseline, valueDigits = 1, highlightIndex }: ScientificBarChartProps) {
   return (
     <section className="chart-panel surface" aria-label={title}>
       <div className="chart-header">
@@ -34,7 +36,7 @@ export function ScientificBarChart({ data, title, seriesLabel, units, source, pe
             <Tooltip cursor={{ fill: "#1a2a41" }} contentStyle={{ background: "#101b2d", border: "1px solid #2b4564", borderRadius: 9, color: "#e8f1fc", fontSize: 11 }} labelStyle={{ color: "#91a6bf", fontFamily: "JetBrains Mono, monospace", marginBottom: 4 }} itemStyle={{ color, fontFamily: "JetBrains Mono, monospace" }} formatter={(value) => [typeof value === "number" ? `${value.toFixed(4)} ${units}` : value, seriesLabel]} />
             {baseline && <ReferenceLine y={baseline.value} stroke="#fbbf24" strokeDasharray="5 5" label={{ value: baseline.label, fill: "#f2cf69", fontSize: 9, position: "insideTopRight" }} />}
             <Bar dataKey="value" name={seriesLabel} unit={units} fill={color} radius={[4, 4, 0, 0]} maxBarSize={36} isAnimationActive={false}>
-              {data.map((_, index) => <Cell key={`bar-${index}`} fill={data.length === 4 && index === 1 ? "#14b8a6" : color} fillOpacity={0.85} />)}
+              {data.map((_, index) => <Cell key={`bar-${index}`} fill={index === highlightIndex ? "#14b8a6" : color} fillOpacity={0.85} />)}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
@@ -44,3 +46,4 @@ export function ScientificBarChart({ data, title, seriesLabel, units, source, pe
     </section>
   );
 }
+
