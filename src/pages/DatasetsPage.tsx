@@ -1,80 +1,41 @@
-import React from "react";
+import { Archive, ArrowDownToLine, FileSpreadsheet, FileText, FolderOpen } from "lucide-react";
 import { SourceTraceabilityTable } from "../components/SourceTraceabilityTable";
 import { ScientificCaveat } from "../components/ScientificCaveat";
 
-export const DatasetsPage: React.FC = () => {
+const sourceFiles = [
+  { name: "sep_26g4.areaAvgTimeSeries.GPM_3IMERGDL_07_precipitation.20260901-20260930.170W_5S_120W_5N.csv", kind: "NASA Giovanni CSV", description: "Daily GPM IMERG v07 precipitation · 1–30 September 2026 · 170°W–120°W, 5°S–5°N" },
+  { name: "g4.areaAvgTimeSeries.GPM_3IMERGDL_07_precipitation.20010101-20200101.170W_5S_120W_5N.csv", kind: "NASA Giovanni CSV", description: "Daily GPM IMERG v07 precipitation · September baseline source spanning 2001–2019" },
+  { name: "ORAS5_Thermocline_Cleaned_1958_2025_No_Readme.xlsx", kind: "ECMWF ORAS5 workbook", description: "Monthly depth of 20°C isotherm source values · 0°N, 110°W · Jan 1958–Nov 2025" },
+];
+
+export function DatasetsPage() {
   return (
-    <section>
-      <h2 style={{ fontSize: "24px", color: "#f3f4f6", margin: "0 0 16px 0" }}>
-        Datasets, Provenance & Traceability
-      </h2>
-      <p style={{ color: "#d1d5db", lineHeight: 1.6, marginBottom: "20px" }}>
-        EarthTrend strictly enforces scientific transparency. Every data point in this dashboard originates from an authoritative, un-simulated earth observation platform or operational meteorological agency.
-      </p>
-
-      {/* Raw Data Storage & Preservation */}
-      <div style={{ background: "#111827", padding: "20px", borderRadius: "12px", border: "1px solid #1f2937", marginBottom: "24px" }}>
-        <h3 style={{ margin: "0 0 12px 0", color: "#60a5fa", fontSize: "18px" }}>
-          Preserved Raw Data Artifacts (in <code>src/data/raw/</code>)
-        </h3>
-        <p style={{ color: "#9ca3af", fontSize: "14px", marginBottom: "16px" }}>
-          The repository stores the unedited raw source files. The application's typed arrays are directly reproducible from these source files:
-        </p>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "12px" }}>
-          <div style={{ background: "#1f2937", padding: "14px", borderRadius: "8px", border: "1px solid #374151" }}>
-            <div style={{ fontWeight: "bold", color: "#f3f4f6", fontSize: "14px" }}>
-              sep_26g4.areaAvgTimeSeries...csv
-            </div>
-            <div style={{ fontSize: "12px", color: "#9ca3af", marginTop: "4px" }}>
-              NASA Giovanni GPM IMERG v07 Late Run · 30 daily observations (1–30 Sep 2026) · Sum = 132.9762 mm · Size: 1.25 KB
-            </div>
-          </div>
-
-          <div style={{ background: "#1f2937", padding: "14px", borderRadius: "8px", border: "1px solid #374151" }}>
-            <div style={{ fontWeight: "bold", color: "#f3f4f6", fontSize: "14px" }}>
-              g4.areaAvgTimeSeries...20010101-20200101.csv
-            </div>
-            <div style={{ fontSize: "12px", color: "#9ca3af", marginTop: "4px" }}>
-              NASA Giovanni GPM IMERG v07 Late Run · 19-year daily series · 570 September baseline days · Size: 156.8 KB
-            </div>
-          </div>
-
-          <div style={{ background: "#1f2937", padding: "14px", borderRadius: "8px", border: "1px solid #374151" }}>
-            <div style={{ fontWeight: "bold", color: "#f3f4f6", fontSize: "14px" }}>
-              ORAS5_Thermocline_Cleaned_1958_2025_No_Readme.xlsx
-            </div>
-            <div style={{ fontSize: "12px", color: "#9ca3af", marginTop: "4px" }}>
-              ECMWF ORAS5 Ocean Reanalysis · 815 monthly values at 0°N, 110°W (Jan 1958–Nov 2025) · Size: 42.2 KB
-            </div>
-          </div>
-        </div>
+    <section className="page-section datasets-page">
+      <div className="page-intro">
+        <div><div className="eyebrow">Sources · periods · methods</div><h2>Dataset provenance</h2><p>Trace each displayed value back to its agency, product, spatial domain, period, baseline, calculation, and destination.</p></div>
+        <span className="badge"><span className="badge-dot" />Verified Source Data</span>
       </div>
 
-      {/* Complete Traceability Matrix */}
-      <div style={{ background: "#111827", padding: "20px", borderRadius: "12px", border: "1px solid #1f2937", marginBottom: "20px" }}>
-        <h3 style={{ margin: "0 0 8px 0", color: "#f3f4f6", fontSize: "18px" }}>
-          Source-to-Visualization Traceability Matrix
-        </h3>
-        <p style={{ color: "#9ca3af", fontSize: "13px", marginBottom: "16px" }}>
-          Comprehensive lineage linking every displayed figure to its raw source, processing transformation, mathematical calculation, and destination component:
-        </p>
+      <section className="surface traceability-surface">
+        <div className="traceability-heading"><div><div className="eyebrow">Source-to-visualization matrix</div><h3 className="surface-title">Evidence and lineage</h3></div><span className="trace-count mono">8 traced parameters</span></div>
         <SourceTraceabilityTable />
-      </div>
+      </section>
 
-      {/* Temporal Freeze Notice */}
-      <div style={{ background: "#1f2937", borderLeft: "4px solid #f59e0b", padding: "16px", borderRadius: "0 8px 8px 0" }}>
-        <div style={{ fontWeight: "bold", color: "#fbbf24", marginBottom: "6px" }}>
-          Dataset Freeze & Backend Scope Notice
+      <section className="raw-manifest surface surface-pad">
+        <div className="manifest-header"><div><div className="eyebrow">Preserved original inputs</div><h3 className="surface-title">Raw files</h3><p className="surface-subtitle">Original CSV and XLSX files remain unchanged in <code>src/data/raw/</code>.</p></div><div className="manifest-icon"><Archive size={19} /></div></div>
+        <div className="raw-file-list">
+          {sourceFiles.map((file, index) => {
+            const Icon = index === 2 ? FileSpreadsheet : FileText;
+            return <article key={file.name} className="raw-file-row"><span className="raw-file-icon"><Icon size={17} /></span><div className="raw-file-copy"><strong>{file.name}</strong><span>{file.description}</span></div><span className="raw-file-kind">{file.kind}</span></article>;
+          })}
         </div>
-        <p style={{ color: "#e5e7eb", fontSize: "14px", margin: 0, lineHeight: 1.5 }}>
-          All observational datasets were frozen on <b>13 November 2026</b> for the NASA Space Apps Challenge. This repository contains no backend server or streaming APIs; where a continuous live observational series is unavailable in official repositories (such as post-2025 ORAS5 reanalysis), the interface displays <code>Data unavailable</code> rather than synthetic demo points.
-        </p>
-      </div>
+        <div className="reproducibility-note"><FolderOpen size={15} /><span>Typed chart modules are reproducible from these source files with <code>python scripts/extractChartData.py</code>. The extraction check reports any raw-source mismatch before chart use.</span><ArrowDownToLine size={15} /></div>
+      </section>
 
-      <ScientificCaveat significanceNotAssessed={true}>
-        Significance not assessed: Metadata documentation confirms observational provenance and baseline integrity.
-      </ScientificCaveat>
+      <div className="data-freeze-note"><strong>Data freeze · 13 November 2026</strong><span>This application serves the preserved, locally bundled observations and documented headline values. It does not use demo series or a backend feed.</span></div>
+      <ScientificCaveat>Significance not assessed. Provenance and deterministic calculation checks do not constitute a statistical significance test.</ScientificCaveat>
     </section>
   );
-};
+}
+
+
