@@ -1,11 +1,14 @@
 import "../relationships.css";
 import { ArrowRight, BookOpenText, CircleHelp, Globe2, Thermometer, Waves } from "lucide-react";
 import { ScientificCaveat } from "../components/ScientificCaveat";
+import { PageFinding, PageSummary } from "../components/PageFinding";
 import { iod, monsoon2026, nino34, pacificRainfall, thermocline } from "../data/realData";
 
 export function RelationshipsPage({ onNavigate }: { onNavigate: () => void }) {
   return (
     <section className="page-section relationship-page">
+      <PageSummary>Compare Pacific observations and agency assessments while keeping dates, variables, and evidence limits distinct.</PageSummary>
+      <PageFinding value={`+${nino34.oct2026Monthly}°C`} result="No significance test reported" meaning="The observations use different periods and variables; co-occurrence alone does not establish a relationship." />
       <div className="page-intro">
         <div><div className="eyebrow">Evidence before explanation</div><h2>How the observations relate</h2><p>Compare observations and agency assessments while keeping their periods, variables, and limits distinct.</p></div>
         <span className="badge"><span className="badge-dot" />No significance test reported</span>

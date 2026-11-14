@@ -3,13 +3,47 @@ import { ArrowUpRight, Database, Globe2, MapPin, MoveRight } from "lucide-react"
 import { StatCard } from "../components/StatCard";
 import { PacificSchematicMap } from "../components/PacificSchematicMap";
 import { ScientificCaveat } from "../components/ScientificCaveat";
+import { PageFinding, PageSummary } from "../components/PageFinding";
 import { iod, monsoon2026, nino34, pacificRainfall } from "../data/realData";
+import { gldasSoilMoisture } from "../data/gldasSoilMoistureData";
+import { modisAquaMonthlySst } from "../data/modisAquaSstData";
+import { oras5ThermoclineData } from "../data/oras5ThermoclineData";
+import { analyzeTrend } from "../lib/trendAnalysis";
 
 type PageId = "overview" | "trend" | "relationships" | "monsoon" | "datasets" | "methodology" | "phase3";
+
+const rajasthanTrend = analyzeTrend(gldasSoilMoisture.filter((point) => point.region === "Rajasthan"));
+const assamTrend = analyzeTrend(gldasSoilMoisture.filter((point) => point.region === "Assam"));
+const modisTrend = analyzeTrend(modisAquaMonthlySst, {
+  positive: "upward long-term trend in absolute SST",
+  negative: "downward long-term trend in absolute SST",
+  notSignificant: "No significant long-term trend detected",
+});
+const oras5Trend = analyzeTrend(oras5ThermoclineData, {
+  positive: "upward trend in source values",
+  negative: "downward trend in source values",
+});
+
+function KeyFindingCard({ value, result, meaning, onClick }: { value: string; result: string; meaning: string; onClick: () => void }) {
+  return <article className="key-finding-card surface"><span className="key-finding-value mono">{value}</span><strong>{result}</strong><p>{meaning}</p><button className="text-link" type="button" onClick={onClick}>See supporting page <ArrowUpRight size={14} /></button></article>;
+}
 
 export function OverviewPage({ onNavigate }: { onNavigate: (page: PageId) => void }) {
   return (
     <section className="page-section">
+      <PageSummary>Verified climate observations, historical trends, and their stated baselines are brought together here with source links and scientific limits in view.</PageSummary>
+      <PageFinding value={`+${nino34.oct2026Monthly}°C`} result="Significance not assessed" meaning="Monthly Niño-3.4 anomalies are a two-month record; co-occurrence does not establish causation." />
+      <section className="key-findings-section" aria-label="Key findings">
+        <div className="section-heading-row"><div><div className="eyebrow">Across the observation set</div><h3 className="section-heading">Key findings</h3></div></div>
+        <div className="key-findings-grid">
+          <KeyFindingCard value={`+${nino34.oct2026Monthly}°C`} result="Positive monthly anomaly" meaning="October 2026; monthly anomaly, not ONI." onClick={() => onNavigate("trend")} />
+          <KeyFindingCard value={`+${pacificRainfall.sep2026Anomaly} mm/day`} result="Above September baseline" meaning="September 2026 mean is above the 2001–2019 baseline." onClick={() => onNavigate("trend")} />
+          <KeyFindingCard value={`${rajasthanTrend.senSlopePerYear > 0 ? "+" : ""}${rajasthanTrend.senSlopePerYear.toFixed(6)} kg/m²/year`} result={rajasthanTrend.significanceLabel} meaning="Monthly soil moisture shows significant wetting in Rajasthan; no seasonal or serial-autocorrelation adjustment." onClick={() => onNavigate("trend")} />
+          <KeyFindingCard value={`${assamTrend.senSlopePerYear.toFixed(6)} kg/m²/year`} result={assamTrend.significanceLabel} meaning="Monthly values slope downward, but the trend is not significant; seasonality and serial autocorrelation are not adjusted." onClick={() => onNavigate("trend")} />
+          <KeyFindingCard value={`${modisTrend.senSlopePerYear.toFixed(6)} °C/year`} result="No significant trend" meaning="MODIS Aqua absolute SST in °C; ENSO variability dominates over this 23-year record." onClick={() => onNavigate("trend")} />
+          <KeyFindingCard value={`${oras5Trend.senSlopePerYear.toFixed(6)} source-value units/year`} result={oras5Trend.significanceLabel} meaning="ORAS5 units remain unconfirmed; source values are not labelled metres." onClick={() => onNavigate("trend")} />
+        </div>
+      </section>
       <div className="overview-banner">
         <div className="overview-banner-copy">
           <div className="badge"><span className="badge-dot" />NASA Space Apps Challenge</div>
