@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "test": "node scripts/validateData.mjs",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "data:extract": "python scripts/extractChartData.py",
+    "data:check": "python scripts/extractChartData.py --check"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.5",
