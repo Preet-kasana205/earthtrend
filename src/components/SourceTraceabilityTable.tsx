@@ -1,6 +1,9 @@
 import "../traceability.css";
 import "../traceability.css";
 import { traceabilityData } from "../data/traceabilityData";
+import { gldasTraceabilityData } from "../data/gldasTraceabilityData";
+
+const allTraceabilityData = [...traceabilityData, gldasTraceabilityData];
 
 export function SourceTraceabilityTable() {
   return (
@@ -8,7 +11,7 @@ export function SourceTraceabilityTable() {
       <table className="trace-table">
         <thead><tr><th>Displayed value</th><th>Variable · source agency</th><th>Domain · period</th><th>Baseline · calculation</th><th>Destination</th><th>Status</th></tr></thead>
         <tbody>
-          {traceabilityData.map((item, index) => {
+          {allTraceabilityData.map((item, index) => {
             const tone = item.verificationStatus === "Verified" ? "verified" : item.verificationStatus === "Caution / Caveated" ? "caution" : item.verificationStatus === "Pattern-Only" ? "pattern" : "forecast";
             return (
               <tr key={`${item.variableName}-${index}`}>

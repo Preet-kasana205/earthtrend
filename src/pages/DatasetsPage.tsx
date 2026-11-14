@@ -6,6 +6,8 @@ const sourceFiles = [
   { name: "sep_26g4.areaAvgTimeSeries.GPM_3IMERGDL_07_precipitation.20260901-20260930.170W_5S_120W_5N.csv", kind: "NASA Giovanni CSV", description: "Daily GPM IMERG v07 precipitation · 1–30 September 2026 · 170°W–120°W, 5°S–5°N" },
   { name: "g4.areaAvgTimeSeries.GPM_3IMERGDL_07_precipitation.20010101-20200101.170W_5S_120W_5N.csv", kind: "NASA Giovanni CSV", description: "Daily GPM IMERG v07 precipitation · September baseline source spanning 2001–2019" },
   { name: "ORAS5_Thermocline_Cleaned_1958_2025_No_Readme.xlsx", kind: "ECMWF ORAS5 workbook", description: "Monthly depth of 20°C isotherm source values · 0°N, 110°W · Jan 1958–Nov 2025" },
+  { name: "g4.areaAvgTimeSeries.GLDAS_NOAH025_M_2_1_SoilMoi0_10cm_inst.20000101-20251231.69E_23N_78E_30N.csv", kind: "NASA Giovanni CSV", description: "GLDAS Noah v2.1 soil moisture content · 0–10 cm · Rajasthan · Jan 2000–Dec 2025" },
+  { name: "g4.areaAvgTimeSeries.GLDAS_NOAH025_M_2_1_SoilMoi0_10cm_inst.20000101-20251231.89E_24N_96E_28N.csv", kind: "NASA Giovanni CSV", description: "GLDAS Noah v2.1 soil moisture content · 0–10 cm · Assam · Jan 2000–Dec 2025" },
 ];
 
 export function DatasetsPage() {
@@ -17,7 +19,7 @@ export function DatasetsPage() {
       </div>
 
       <section className="surface traceability-surface">
-        <div className="traceability-heading"><div><div className="eyebrow">Source-to-visualization matrix</div><h3 className="surface-title">Evidence and lineage</h3></div><span className="trace-count mono">8 traced parameters</span></div>
+        <div className="traceability-heading"><div><div className="eyebrow">Source-to-visualization matrix</div><h3 className="surface-title">Evidence and lineage</h3></div><span className="trace-count mono">9 traced parameters</span></div>
         <SourceTraceabilityTable />
       </section>
 
@@ -29,11 +31,11 @@ export function DatasetsPage() {
             return <article key={file.name} className="raw-file-row"><span className="raw-file-icon"><Icon size={17} /></span><div className="raw-file-copy"><strong>{file.name}</strong><span>{file.description}</span></div><span className="raw-file-kind">{file.kind}</span></article>;
           })}
         </div>
-        <div className="reproducibility-note"><FolderOpen size={15} /><span>Typed chart modules are reproducible from these source files with <code>python scripts/extractChartData.py</code>. The extraction check reports any raw-source mismatch before chart use.</span><ArrowDownToLine size={15} /></div>
+        <div className="reproducibility-note"><FolderOpen size={15} /><span>Typed chart modules are reproducible from the preserved source files with <code>npm run data:extract</code>; <code>npm run data:check</code> validates the raw records and generated modules.</span><ArrowDownToLine size={15} /></div>
       </section>
 
       <div className="data-freeze-note"><strong>Data freeze · 13 November 2026</strong><span>This application serves the preserved, locally bundled observations and documented headline values. It does not use demo series or a backend feed.</span></div>
-      <ScientificCaveat>Significance not assessed. Provenance and deterministic calculation checks do not constitute a statistical significance test.</ScientificCaveat>
+      <ScientificCaveat significanceNotAssessed={false}>GLDAS has a documented trend test on the Trend Explorer. Statistical significance is not assessed for the other descriptive observations; provenance checks do not constitute a trend test.</ScientificCaveat>
     </section>
   );
 }

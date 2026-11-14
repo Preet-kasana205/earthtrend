@@ -2,6 +2,9 @@ import { nino34, pacificRainfall, iod, monsoon2026, thermocline } from "../src/d
 import { pacificDailyRainfall2026 } from "../src/data/pacificDailyRainfall2026.ts";
 import { oras5ThermoclineData } from "../src/data/oras5ThermoclineData.ts";
 import { traceabilityData } from "../src/data/traceabilityData.ts";
+import { gldasSoilMoisture } from "../src/data/gldasSoilMoistureData.ts";
+import { gldasTraceabilityData } from "../src/data/gldasTraceabilityData.ts";
+import { analyzeTrend } from "../src/lib/trendAnalysis.ts";
 import assert from "node:assert";
 
 console.log("Running EarthTrend Scientific Data Validation Tests...\n");
@@ -46,6 +49,47 @@ console.log("✔ Test 3 Passed: 815 monthly observations verified (Jan 1958 - No
 
 console.log("\nTest 4: Traceability Matrix Completeness");
 assert(traceabilityData.length >= 7, "Traceability matrix must cover all required parameters");
-console.log(`✔ Test 4 Passed: ${traceabilityData.length} parameters fully traced.`);
-console.log("\nAll EarthTrend data validation tests passed successfully!");
+console.log(`✔ Test 4 Passed: ${traceabilityData.length} existing parameters traced.`);
 
+
+console.log("\nTest 5: NASA GLDAS Soil Moisture Series");
+assert.strictEqual(gldasSoilMoisture.length, 624, "GLDAS must have 312 monthly observations per region");
+for (const region of ["Rajasthan", "Assam"]) {
+  const points = gldasSoilMoisture.filter((point) => point.region === region);
+  assert.strictEqual(points.length, 312, `${region} must contain 312 observations`);
+  assert.strictEqual(points[0].date, "2000-01", `${region} must start in Jan 2000`);
+  assert.strictEqual(points[311].date, "2025-12", `${region} must end in Dec 2025`);
+  assert.strictEqual(new Set(points.map((point) => point.date)).size, 312, `${region} months must be unique`);
+  assert(points.every((point) => Number.isInteger(point.year) && Number.isInteger(point.month) && Number.isFinite(point.value)), `${region} observations must have numeric values`);
+  for (let index = 1; index < points.length; index += 1) {
+    const previous = points[index - 1];
+    const current = points[index];
+    const next = previous.month === 12 ? `${previous.year + 1}-01` : `${previous.year}-${String(previous.month + 1).padStart(2, "0")}`;
+    assert.strictEqual(current.date, next, `${region} dates must be continuous after ${previous.date}`);
+  }
+}
+const rajasthanTrend = analyzeTrend(gldasSoilMoisture.filter((point) => point.region === "Rajasthan"));
+const assamTrend = analyzeTrend(gldasSoilMoisture.filter((point) => point.region === "Assam"));
+assert(Math.abs(rajasthanTrend.senSlopePerYear - 0.086226) < 0.00001, `Rajasthan trend slope unexpected: ${rajasthanTrend.senSlopePerYear}`);
+assert(Math.abs(rajasthanTrend.mannKendallP - 0.005565) < 0.00001, `Rajasthan Mann–Kendall p unexpected: ${rajasthanTrend.mannKendallP}`);
+assert.strictEqual(rajasthanTrend.significanceLabel, "Significant wetting");
+assert(Math.abs(assamTrend.senSlopePerYear - -0.027743) < 0.00001, `Assam trend slope unexpected: ${assamTrend.senSlopePerYear}`);
+assert(Math.abs(assamTrend.mannKendallP - 0.346636) < 0.00001, `Assam Mann–Kendall p unexpected: ${assamTrend.mannKendallP}`);
+assert.strictEqual(assamTrend.significanceLabel, "Not significant drying");
+console.log(`  Rajasthan: Sen slope=${rajasthanTrend.senSlopePerYear.toFixed(6)} kg/m2/year; Mann-Kendall p=${rajasthanTrend.mannKendallP.toFixed(8)}; ${rajasthanTrend.significanceLabel}`);
+console.log(`  Assam: Sen slope=${assamTrend.senSlopePerYear.toFixed(6)} kg/m2/year; Mann-Kendall p=${assamTrend.mannKendallP.toFixed(8)}; ${assamTrend.significanceLabel}`);
+const regionMeans = Object.fromEntries(["Rajasthan", "Assam"].map((region) => {
+  const values = gldasSoilMoisture.filter((point) => point.region === region).map((point) => point.value);
+  return [region, values.reduce((sum, value) => sum + value, 0) / values.length];
+}));
+assert(Math.abs((regionMeans.Assam - regionMeans.Rajasthan) - 11.049429) < 0.00001, "Assam–Rajasthan full-period mean difference must be +11.05 kg/m2");
+console.log("✔ Test 5 Passed: both 312-month GLDAS series and computed trend results verified.");
+
+console.log("\nTest 6: GLDAS Traceability Record");
+assert.strictEqual(gldasTraceabilityData.verificationStatus, "Verified");
+assert(gldasTraceabilityData.variableName.includes("0–10 cm"), "Traceability must name the measured soil layer");
+assert(gldasTraceabilityData.productDataset.includes("v2.1"), "Traceability must identify GLDAS Noah v2.1");
+assert(gldasTraceabilityData.temporalPeriod.includes("312 monthly observations per region"), "Traceability must identify the verified periods and counts");
+assert(gldasTraceabilityData.destinationComponent.includes("Trend Explorer"), "Traceability must point to the selector");
+console.log("✔ Test 6 Passed: NASA GLDAS is represented in the source-to-visualization matrix.");
+console.log("\nAll EarthTrend data validation tests passed successfully!");
