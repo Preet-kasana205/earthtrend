@@ -16,6 +16,7 @@ RAIN_BASELINE = RAW / "g4.areaAvgTimeSeries.GPM_3IMERGDL_07_precipitation.200101
 ORAS5 = RAW / "ORAS5_Thermocline_Cleaned_1958_2025_No_Readme.xlsx"
 PACIFIC_OUT = ROOT / "src" / "data" / "pacificDailyRainfall2026.ts"
 ORAS5_OUT = ROOT / "src" / "data" / "oras5ThermoclineData.ts"
+PACIFIC_BASELINE_OUT = ROOT / "src" / "data" / "pacificSeptemberBaselineMeans.ts"
 
 
 def read_giovanni(path: Path) -> list[dict[str, Any]]:
@@ -94,7 +95,7 @@ def ts_array(interface: str, name: str, rows: list[dict[str, Any]], metadata: li
     return f"{comments}\n\nexport interface {interface} {{\n  date: string;\n  {('day: number;\n  precipitation: number;' if interface == 'DailyRainfallPoint' else 'year: number;\n  month: number;\n  value: number;')}\n}}\n\nexport const {name}: {interface}[] = {body};\n"
 
 
-def validate_and_render() -> tuple[str, str, list[dict[str, Any]], list[dict[str, Any]]]:
+def validate_and_render() -> tuple[str, str, str, list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
     daily_rows = read_giovanni(RAIN_2026)
     daily_dates = [row["date"] for row in daily_rows]
     expected_days = [date(2026, 9, day) for day in range(1, 31)]
@@ -114,6 +115,21 @@ def validate_and_render() -> tuple[str, str, list[dict[str, Any]], list[dict[str
     baseline_mean = baseline_sum / len(september)
     if abs(baseline_sum - 383.7893) >= 0.00005 or abs(baseline_mean - 0.6733) >= 0.00005:
         raise ValueError(f"Unexpected baseline totals: sum={baseline_sum:.8f}, mean={baseline_mean:.8f}")
+    september_annual_means = []
+    for year in range(2001, 2020):
+        annual_days = [row for row in september if row["date"].year == year]
+        annual_dates = [row["date"] for row in annual_days]
+        expected_annual_dates = [date(year, 9, day) for day in range(1, 31)]
+        if len(annual_days) != 30 or annual_dates != expected_annual_dates:
+            raise ValueError(f"September {year} must have exactly 30 daily observations in date order")
+        september_annual_means.append({
+            "date": f"{year}-09",
+            "year": year,
+            "value": sum(row["value"] for row in annual_days) / len(annual_days),
+            "observationCount": len(annual_days),
+        })
+    if len(september_annual_means) != 19:
+        raise ValueError(f"Expected 19 annual September means, got {len(september_annual_means)}")
 
     oras_rows, unit_header = read_oras5()
     months = [(row["date"].year, row["date"].month) for row in oras_rows]
@@ -141,15 +157,23 @@ def validate_and_render() -> tuple[str, str, list[dict[str, Any]], list[dict[str
         [f"Extracted directly from {ORAS5.relative_to(ROOT).as_posix()}, worksheet Monthly Data.",
          "ECMWF ORAS5 depth of 20°C isotherm at 0°N, 110°W; Jan 1958–Nov 2025; 815 monthly records.",
          f"Source header: {unit_header}. Units are unconfirmed; values are not labelled as metres."])
-    return rainfall_ts, oras_ts, rainfall_points, thermocline_points
+    september_body = json.dumps(september_annual_means, ensure_ascii=False, indent=2, allow_nan=False)
+    september_ts = (
+        "// Generated from the preserved NASA Giovanni GPM baseline CSV by scripts/extractChartData.py.\n"
+        "// Annual September means use the original 30 daily observations in each year, 2001–2019.\n"
+        "export interface AnnualSeptemberRainfallMeanPoint {\n"
+        "  date: string;\n  year: number;\n  value: number;\n  observationCount: number;\n}\n\n"
+        f"export const pacificSeptemberBaselineMeans: AnnualSeptemberRainfallMeanPoint[] = {september_body};\n"
+    )
+    return rainfall_ts, oras_ts, september_ts, rainfall_points, thermocline_points, september_annual_means
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Reproduce typed chart series from the preserved CSV and XLSX sources.")
     parser.add_argument("--check", action="store_true", help="Validate sources and ensure generated modules are up to date without writing files.")
     args = parser.parse_args()
-    rainfall_ts, oras_ts, rainfall_points, thermocline_points = validate_and_render()
-    outputs = ((PACIFIC_OUT, rainfall_ts), (ORAS5_OUT, oras_ts))
+    rainfall_ts, oras_ts, september_ts, rainfall_points, thermocline_points, september_annual_means = validate_and_render()
+    outputs = ((PACIFIC_OUT, rainfall_ts), (ORAS5_OUT, oras_ts), (PACIFIC_BASELINE_OUT, september_ts))
     if args.check:
         stale = [path.relative_to(ROOT).as_posix() for path, expected in outputs if not path.exists() or path.read_text(encoding="utf-8-sig") != expected]
         if stale:
@@ -165,7 +189,8 @@ def main() -> int:
     rain_sum = sum(point["precipitation"] for point in rainfall_points)
     rain_mean = rain_sum / len(rainfall_points)
     print(f"  Pacific Sep 2026: {len(rainfall_points)} daily observations, 2026-09-01 through 2026-09-30; sum={rain_sum:.4f} mm; mean={rain_mean:.4f} mm/day")
-    print("  September baseline 2001–2019: 570 observations; sum=383.7893 mm; mean=0.6733 mm/day; anomaly=+3.7592 mm/day")
+    print("  September baseline 2001–2019: 570 daily observations; sum=383.7893 mm; mean=0.6733 mm/day; anomaly=+3.7592 mm/day")
+    print(f"  September annual means: {len(september_annual_means)} computed points, {september_annual_means[0]['date']} through {september_annual_means[-1]['date']}; 30 daily observations per mean")
     print(f"  ORAS5: {len(thermocline_points)} monthly observations, {thermocline_points[0]['date']} through {thermocline_points[-1]['date']}; 815 unique continuous dates; no missing/non-numeric values")
     print("  ORAS5 location: 0°N, 110°W for all rows; unit remains unconfirmed")
     print(f"  Result: {action}.")

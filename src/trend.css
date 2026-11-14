@@ -38,3 +38,5 @@
 .soil-trend-footnote { margin:0; color:#7186a0; font-size:9px; line-height:1.6; }
 @media(max-width:900px) { .soil-trend-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .soil-region-compare { grid-column:1/-1; } }
 @media(max-width:700px) { .trend-selector { grid-template-columns:1fr; align-items:stretch; gap:14px; } .trend-select-field select { font-size:10px; } .trend-selector-note { align-self:auto; } .soil-trend-heading { align-items:flex-start; flex-direction:column; } .soil-trend-method { text-align:left; } .soil-trend-grid { grid-template-columns:1fr; } .soil-region-compare { grid-column:auto; } }
+
+.soil-trend-grid.single { grid-template-columns:minmax(0,1fr); }

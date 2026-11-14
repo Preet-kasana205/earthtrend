@@ -35,7 +35,7 @@ export function DatasetsPage() {
       </section>
 
       <div className="data-freeze-note"><strong>Data freeze · 13 November 2026</strong><span>This application serves the preserved, locally bundled observations and documented headline values. It does not use demo series or a backend feed.</span></div>
-      <ScientificCaveat significanceNotAssessed={false}>GLDAS has a documented trend test on the Trend Explorer. Statistical significance is not assessed for the other descriptive observations; provenance checks do not constitute a trend test.</ScientificCaveat>
+      <ScientificCaveat significanceNotAssessed={false}>Trend tests are shown for GLDAS, ORAS5, and the 19 annual September baseline means. Significance is not assessed for the two-month SST record or the single-season monsoon percentages.</ScientificCaveat>
     </section>
   );
 }

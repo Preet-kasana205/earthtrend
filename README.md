@@ -20,8 +20,8 @@ EarthTrend is a static, source-traceable dashboard for exploring verified Pacifi
 - Tailwind CSS v4 through `@tailwindcss/vite`; shared dark design tokens and responsive sidebar/top bar/footer.
 - Recharts line and bar charts with tooltips and gridlines; lucide-react icons.
 - `src/data/realData.ts` contains verified headline values and their source, period, baseline, and caveat metadata. Preparedness curriculum content is in `src/data/phase3Data.ts`.
-- Chart series extracted from original files live in `src/data/pacificDailyRainfall2026.ts`, `src/data/oras5ThermoclineData.ts`, and `src/data/gldasSoilMoistureData.ts`.
-- `src/lib/trendAnalysis.ts` computes Theil–Sen slopes and two-sided Mann–Kendall p-values from the supplied monthly observations; results are not hardcoded.
+- Chart series extracted from original files live in `src/data/pacificDailyRainfall2026.ts`, `src/data/pacificSeptemberBaselineMeans.ts`, `src/data/oras5ThermoclineData.ts`, and `src/data/gldasSoilMoistureData.ts`.
+- `src/lib/trendAnalysis.ts` is the shared Theil–Sen slope and two-sided Mann–Kendall engine for monthly series and annual September means. Trend results are computed from observations, not hardcoded.
 - `src/data/raw/` stores the original source files unchanged. There is no application backend or live data endpoint.
 
 ## Datasets and sources
@@ -49,14 +49,15 @@ EarthTrend is a static, source-traceable dashboard for exploring verified Pacifi
 ## Methodology and scientific safeguards
 
 - September 2026 rainfall: 30 daily observations sum to **132.9762 mm**, giving a mean of **4.4325 mm/day**.
-- September 2001–2019 baseline: 570 daily observations sum to **383.7893 mm**, giving a mean of **0.6733 mm/day**.
+- September 2001–2019 baseline: 570 daily observations sum to **383.7893 mm**, giving a mean of **0.6733 mm/day**. The extractor also computes 19 separate annual September means (30 daily values each); those means, rather than hardcoded values, feed the baseline trend test.
 - Mean departure: **4.4325 − 0.6733 = +3.7592 mm/day**.
 - The chart modules are reproducibly generated from the preserved CSV and XLSX sources. The extraction checks dates, record counts, duplicates, missing/nonnumeric values, coordinates, source headers, and reported calculations. No synthetic points or missing-value interpolation is used.
-- GLDAS trends use the median of pairwise Theil–Sen slopes, annualized by elapsed calendar time, and a two-sided standard Mann–Kendall test with tie-corrected variance and continuity correction at α = 0.05. The p-value uses a normal approximation; the test does not adjust for seasonality or serial autocorrelation. A rising annual-mean soil moisture value does not mean droughts did not occur.
+- GLDAS and ORAS5 use Theil–Sen slopes annualized by elapsed calendar time and a two-sided standard Mann–Kendall test with tie-corrected variance and continuity correction at α = 0.05. ORAS5 remains in unconfirmed source-value units. The annual September rainfall trend uses 19 means computed from the 2001–2019 baseline CSV. P-values use a normal approximation and do not adjust for serial autocorrelation; monthly GLDAS/ORAS5 tests also have no seasonal adjustment. A rising annual-mean soil moisture value does not mean droughts did not occur.
+- Niño-3.4 significance is not assessed because the available series contains only September (+2.1°C) and October (+2.5°C), too few monthly observations for a trend test. Monsoon percentages remain descriptive because four monthly percentages against LPA describe one season, not a comparable multi-year time series.
 - Monthly Niño-3.4 SST anomalies are not ONI. ONI is a three-month running index.
 - ORAS5 thermocline source values keep the workbook's unconfirmed-units caveat. NOAA CPC subsurface temperature anomalies remain a separate variable.
 - Sea-surface height is pattern-only. Phase 3 provides preparedness education and does not issue predictions or alerts.
-- Trend significance is assessed only for the GLDAS soil moisture series using the documented Mann–Kendall test. Other displayed series remain descriptive; statistical significance does not establish causation.
+- Trend tests are shown for GLDAS, ORAS5 and the 19 annual September baseline means. The two-month SST series and one-season monsoon percentages are not tested; no test result establishes causation.
 - Data snapshot frozen as of 13 November 2026.
 
 ## Setup
@@ -74,7 +75,7 @@ npm run build
 npm run lint
 ```
 
-The data test checks headline values, typed series, and dynamically computed GLDAS trend values. To validate the original files and ensure the generated modules match them, install the XLSX extraction dependency and run:
+The data test checks headline values, typed series, and dynamically computed GLDAS, ORAS5, and annual September rainfall trend values. To validate the original files and ensure the generated modules match them, install the XLSX extraction dependency and run:
 
 ```bash
 python -m pip install -r requirements-extraction.txt

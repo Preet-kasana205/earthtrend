@@ -8,10 +8,15 @@ import { ScientificCaveat } from "../components/ScientificCaveat";
 import { nino34, ssh, thermocline } from "../data/realData";
 import { oras5ThermoclineData } from "../data/oras5ThermoclineData";
 import { pacificDailyRainfall2026 } from "../data/pacificDailyRainfall2026";
+import { pacificSeptemberBaselineMeans } from "../data/pacificSeptemberBaselineMeans";
 import { gldasSoilMoisture, type SoilMoistureRegion } from "../data/gldasSoilMoistureData";
 import { analyzeTrend } from "../lib/trendAnalysis";
 
 type TrendVariable = "nino34" | "pacific-rainfall" | "oras5" | "soil-moisture";
+const directionLabels = {
+  oras5: { positive: "upward trend in source values", negative: "downward trend in source values" },
+  rainfall: { positive: "upward trend in September rainfall rate", negative: "downward trend in September rainfall rate" },
+};
 
 const ninoMonthly = [
   { date: "2026-09", value: nino34.sep2026Monthly },
@@ -19,24 +24,40 @@ const ninoMonthly = [
 ];
 const dailyRainfall = pacificDailyRainfall2026.map((point) => ({ label: point.date, value: point.precipitation }));
 const oras5Values = oras5ThermoclineData.map((point) => ({ date: point.date, value: point.value }));
+const baselineSeptemberValues = pacificSeptemberBaselineMeans.map((point) => ({ date: point.date, value: point.value }));
 const rajasthanSeries = gldasSoilMoisture.filter((point) => point.region === "Rajasthan");
 const assamSeries = gldasSoilMoisture.filter((point) => point.region === "Assam");
 const rajasthanTrend = analyzeTrend(rajasthanSeries);
 const assamTrend = analyzeTrend(assamSeries);
+const oras5Trend = analyzeTrend(oras5ThermoclineData, directionLabels.oras5);
+const baselineSeptemberTrend = analyzeTrend(pacificSeptemberBaselineMeans, directionLabels.rainfall);
 const regionMean = (points: typeof rajasthanSeries) => points.reduce((sum, point) => sum + point.value, 0) / points.length;
 const rajasthanMean = regionMean(rajasthanSeries);
 const assamMean = regionMean(assamSeries);
 const meanDifference = assamMean - rajasthanMean;
 
-function TrendResult({ region, result }: { region: SoilMoistureRegion; result: ReturnType<typeof analyzeTrend> }) {
+function TrendResult({
+  title,
+  period,
+  result,
+  slopeUnits,
+  note,
+}: {
+  title: string;
+  period: string;
+  result: ReturnType<typeof analyzeTrend>;
+  slopeUnits: string;
+  note?: string;
+}) {
   return (
     <article className="soil-trend-result surface surface-pad">
-      <div className="eyebrow">{region} · Jan 2000–Dec 2025</div>
-      <strong className="soil-trend-slope">{result.senSlopePerYear > 0 ? "+" : ""}{result.senSlopePerYear.toFixed(4)} <span>kg/m²/year</span></strong>
+      <div className="eyebrow">{title} · {period}</div>
+      <strong className="soil-trend-slope">{result.senSlopePerYear > 0 ? "+" : ""}{result.senSlopePerYear.toFixed(6)} <span>{slopeUnits}</span></strong>
       <div className="soil-trend-stat-line"><span>Mann–Kendall p</span><strong>{result.mannKendallP.toFixed(6)}</strong></div>
       <span className={`soil-significance ${result.mannKendallP < 0.05 ? "is-significant" : "is-not-significant"}`}>
         {result.significanceLabel}
       </span>
+      {note && <p>{note}</p>}
     </article>
   );
 }
@@ -46,6 +67,12 @@ export function TrendExplorerPage() {
   const [region, setRegion] = useState<SoilMoistureRegion>("Rajasthan");
   const soilMoistureSeries = region === "Rajasthan" ? rajasthanSeries : assamSeries;
   const soilMoistureChart = soilMoistureSeries.map((point) => ({ date: point.date, value: point.value }));
+  const significanceText = {
+    "soil-moisture": "GLDAS significance is assessed with the documented standard Mann–Kendall test; serial autocorrelation and seasonality are not adjusted. A rising annual mean does not rule out droughts.",
+    "pacific-rainfall": "The 19 annual September means are tested below; they use 30 daily observations for the same calendar month in each year. Serial autocorrelation is not adjusted. The separate September 2026 daily chart is descriptive.",
+    oras5: "ORAS5 uses the standard Mann–Kendall test on all 815 monthly source values. Units remain unconfirmed; no seasonal or serial-autorrelation correction is applied.",
+    nino34: "Significance not assessed: only two monthly observations are available (September +2.1°C and October +2.5°C), too short for a trend test.",
+  }[variable];
 
   return (
     <section className="page-section trend-page">
@@ -95,18 +122,32 @@ export function TrendExplorerPage() {
           tickFormatter={(value) => value.slice(0, 4)}
         />
       ) : variable === "pacific-rainfall" ? (
-        <ScientificBarChart
-          data={dailyRainfall}
-          title="Pacific area-averaged daily precipitation rate"
-          seriesLabel="GPM_3IMERGDL_07 precipitation"
-          units="mm/day"
-          source="NASA Giovanni · GPM IMERG v07 Late Run · 170°W–120°W, 5°S–5°N"
-          period="1–30 Sep 2026 · 30 observations"
-          caveat="Full daily series extracted from the original CSV. September 2001–2019 baseline mean: 0.6733 mm/day (570 daily observations)."
-          color="#06b6d4"
-          baseline={{ value: 0.6733, label: "Sep baseline 0.6733 mm/day" }}
-          valueDigits={0}
-        />
+        <>
+          <ScientificBarChart
+            data={dailyRainfall}
+            title="Pacific area-averaged daily precipitation rate"
+            seriesLabel="GPM_3IMERGDL_07 precipitation"
+            units="mm/day"
+            source="NASA Giovanni · GPM IMERG v07 Late Run · 170°W–120°W, 5°S–5°N"
+            period="1–30 Sep 2026 · 30 observations"
+            caveat="Full daily series extracted from the original CSV. September 2001–2019 baseline mean: 0.6733 mm/day (570 daily observations)."
+            color="#06b6d4"
+            baseline={{ value: 0.6733, label: "Sep baseline 0.6733 mm/day" }}
+            valueDigits={0}
+          />
+          <ScientificLineChart
+            data={baselineSeptemberValues}
+            title="September baseline · annual mean precipitation rate"
+            seriesLabel="Computed from 30 daily September values per year"
+            units="mm/day"
+            source="NASA Giovanni · GPM IMERG v07 · 170°W–120°W, 5°S–5°N · original baseline CSV"
+            period="Sep 2001–Sep 2019 · 19 computed annual means"
+            caveat="Each point is calculated from that year's 30 September daily observations. The test is on these 19 baseline means, not the separate September 2026 series; no serial-autocorrelation correction is applied."
+            color="#14b8a6"
+            valueDigits={2}
+            tickFormatter={(value) => value.slice(0, 4)}
+          />
+        </>
       ) : variable === "nino34" ? (
         <ScientificLineChart
           data={ninoMonthly}
@@ -115,7 +156,7 @@ export function TrendExplorerPage() {
           units="°C"
           source="NOAA CPC · ERSST v5"
           period="Sep–Oct 2026 · 1991–2020 baseline"
-          caveat="Monthly anomalies are not ONI, which uses a three-month running mean. Only the two cited monthly observations are plotted."
+          caveat="Monthly anomalies are not ONI, which uses a three-month running mean. Only the two cited monthly observations are plotted; the series is too short for a trend test."
           color="#fb7185"
           valueDigits={1}
           tickFormatter={(value) => value.slice(5)}
@@ -128,7 +169,7 @@ export function TrendExplorerPage() {
           units="Source value (unit unconfirmed)"
           source="ECMWF ORAS5 · original workbook, Monthly Data worksheet · single point 0°N, 110°W"
           period="Jan 1958–Nov 2025 · 815 monthly observations"
-          caveat="Workbook header says ‘confirm units’. Values are not labelled as metres. No 2026 ORAS5 values are present."
+          caveat="Workbook header says ‘confirm units’. Trend is shown in source-value units per year, not metres; standard test has no seasonal or serial-autocorrelation adjustment."
           color="#22d3c5"
           valueDigits={0}
           tickFormatter={(value) => value.slice(0, 4)}
@@ -139,8 +180,8 @@ export function TrendExplorerPage() {
         <section className="soil-trend-section" aria-label="Computed GLDAS trend results">
           <div className="soil-trend-heading"><div><div className="eyebrow">Computed from all monthly observations</div><h3>Regional trend analysis</h3></div><span className="soil-trend-method">Theil–Sen slope · two-sided Mann–Kendall · α = 0.05</span></div>
           <div className="soil-trend-grid">
-            <TrendResult region="Rajasthan" result={rajasthanTrend} />
-            <TrendResult region="Assam" result={assamTrend} />
+            <TrendResult title="Rajasthan" period="Jan 2000–Dec 2025" result={rajasthanTrend} slopeUnits="kg/m²/year" />
+            <TrendResult title="Assam" period="Jan 2000–Dec 2025" result={assamTrend} slopeUnits="kg/m²/year" />
             <article className="soil-trend-result soil-region-compare surface surface-pad">
               <div className="eyebrow">Same-period regional mean</div>
               <strong className="soil-trend-slope">{meanDifference > 0 ? "+" : ""}{meanDifference.toFixed(2)} <span>kg/m²</span></strong>
@@ -150,6 +191,26 @@ export function TrendExplorerPage() {
             </article>
           </div>
           <p className="soil-trend-footnote">Mann–Kendall p-values use a tie-corrected normal approximation and continuity correction. The standard test does not adjust for seasonality or serial autocorrelation; treat these as trend evidence, not causal attribution.</p>
+        </section>
+      )}
+
+      {variable === "oras5" && (
+        <section className="soil-trend-section" aria-label="Computed ORAS5 trend result">
+          <div className="soil-trend-heading"><div><div className="eyebrow">Computed from all 815 monthly observations</div><h3>ORAS5 trend analysis</h3></div><span className="soil-trend-method">Theil–Sen slope · two-sided Mann–Kendall · α = 0.05</span></div>
+          <div className="soil-trend-grid single">
+            <TrendResult title="ORAS5 source values" period="Jan 1958–Nov 2025" result={oras5Trend} slopeUnits="source-value units/year" note="Unit unconfirmed in the workbook header. This trend is reported on source values and is not labelled metres." />
+          </div>
+          <p className="soil-trend-footnote">The standard test uses all monthly values, with tie and continuity correction. No seasonal stratification or serial-autocorrelation adjustment is applied.</p>
+        </section>
+      )}
+
+      {variable === "pacific-rainfall" && (
+        <section className="soil-trend-section" aria-label="Computed Pacific baseline trend result">
+          <div className="soil-trend-heading"><div><div className="eyebrow">Computed from the original baseline CSV</div><h3>Annual September baseline trend</h3></div><span className="soil-trend-method">19 computed annual means · two-sided Mann–Kendall · α = 0.05</span></div>
+          <div className="soil-trend-grid single">
+            <TrendResult title="September mean rainfall rate" period="2001–2019" result={baselineSeptemberTrend} slopeUnits="mm/day/year" note="Each point is the mean of 30 raw daily September observations. The trend test applies to these 19 annual baseline means, not the September 2026 daily series." />
+          </div>
+          <p className="soil-trend-footnote">The annual points are calculated by scripts/extractChartData.py from the baseline CSV. September is held constant across years; serial autocorrelation is not adjusted.</p>
         </section>
       )}
 
@@ -173,10 +234,8 @@ export function TrendExplorerPage() {
       </div>
 
       <ScientificCaveat
-        significanceNotAssessed={variable !== "soil-moisture"}
-        text={variable === "soil-moisture"
-          ? "GLDAS significance is assessed with the documented standard Mann–Kendall test; serial autocorrelation and seasonality are not adjusted. Other displayed records remain descriptive. Statistical trend does not establish causation or rule out droughts."
-          : "Significance is not assessed for this selected descriptive series. The plotted values do not establish statistical significance or causation."}
+        significanceNotAssessed={variable === "nino34"}
+        text={variable === "nino34" ? significanceText : `${significanceText} Statistical significance does not establish causation.`}
       />
     </section>
   );

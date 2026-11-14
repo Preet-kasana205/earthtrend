@@ -11,6 +11,16 @@ export interface TrendAnalysis {
   significanceLabel: string;
 }
 
+export interface TrendDirectionLabels {
+  positive: string;
+  negative: string;
+}
+
+const DEFAULT_DIRECTION_LABELS: TrendDirectionLabels = {
+  positive: "wetting",
+  negative: "drying",
+};
+
 const DAYS_PER_YEAR = 365.2425;
 const SIGNIFICANCE_LEVEL = 0.05;
 
@@ -68,7 +78,10 @@ function mannKendall(values: number[]): { s: number; zScore: number; p: number }
  * standard Mann-Kendall test over the ordered observations. This does not apply
  * seasonal stratification, serial-correlation correction, or causal attribution.
  */
-export function analyzeTrend(observations: readonly TrendObservation[]): TrendAnalysis {
+export function analyzeTrend(
+  observations: readonly TrendObservation[],
+  directionLabels: TrendDirectionLabels = DEFAULT_DIRECTION_LABELS,
+): TrendAnalysis {
   if (observations.length < 2) throw new Error("At least two observations are required to estimate a trend");
   const times = observations.map((observation) => observationTime(observation.date));
   const values = observations.map((observation) => observation.value);
@@ -87,9 +100,14 @@ export function analyzeTrend(observations: readonly TrendObservation[]): TrendAn
 
   const { s, zScore, p } = mannKendall(values);
   const senSlopePerYear = median(slopes);
-  const significanceLabel = p < SIGNIFICANCE_LEVEL
-    ? senSlopePerYear > 0 ? "Significant wetting" : "Significant drying"
-    : senSlopePerYear < 0 ? "Not significant drying" : senSlopePerYear > 0 ? "Not significant wetting" : "No significant trend";
+  const direction = senSlopePerYear > 0
+    ? directionLabels.positive
+    : senSlopePerYear < 0
+      ? directionLabels.negative
+      : null;
+  const significanceLabel = direction === null
+    ? "No significant trend"
+    : `${p < SIGNIFICANCE_LEVEL ? "Significant" : "Not significant"} ${direction}`;
 
   return { senSlopePerYear, mannKendallS: s, zScore, mannKendallP: p, significanceLabel };
 }
