@@ -4,7 +4,6 @@
 export const nino34 = {
   oct2026Monthly: 2.5, // °C, CPC relative index, ERSST, 1991-2020 baseline
   sep2026Monthly: 2.1, // °C, CPC relative index, same baseline
-  weekly25to31Oct2026: 3.4, // °C, conventional index, WEEKLY only — do not mix with monthly
   source: "NOAA CPC ENSO Discussion, Nov 2026",
 };
 
@@ -22,7 +21,7 @@ export const iod = {
 };
 
 export const monsoon2026 = {
-  percentOfLPA: 87,
+  percentOfLPA: 87.4,
   rainfallMm: 759.4,
   lpaMm: 868.6,
   source: "IMD Southwest Monsoon 2026 statement",
