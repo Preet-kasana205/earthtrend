@@ -38,5 +38,6 @@
 .video-note-content { min-width:0; flex:1; }
 .video-note video { display:block; width:100%; max-height:360px; margin-top:10px; border-radius:9px; background:#080f1c; }
 .video-note-drive-preview { display:block; width:100%; height:360px; margin-top:10px; border:0; border-radius:9px; background:#080f1c; }
+.video-note-ai-credit { margin:6px 0 0; color:#879bb0; font-size:14px; line-height:1.5; }
 .video-note-caption { margin:8px 0 0; color:#879bb0; font-size:14px; line-height:1.6; }
 @media(max-width:680px) { .prepared-banner { align-items:flex-start; flex-wrap:wrap; } .prepared-status { margin-left:67px; } .guidance-links { grid-template-columns:1fr; } .learning-heading { align-items:flex-start; flex-direction:column; } .impact-strip { grid-template-columns:1fr; } .cyclone-context li { grid-template-columns:1fr; gap:2px; } }
