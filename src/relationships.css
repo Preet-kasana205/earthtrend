@@ -1,12 +1,12 @@
 .relationship-page { gap:16px; }
 .relationship-story,.iod-compare { display:grid; gap:19px; }
 .story-heading { display:flex; align-items:center; gap:12px; }
-.story-icon { display:grid; place-items:center; width:38px; height:38px; flex:0 0 38px; border:1px solid #235065; border-radius:11px; background:#102a39; color:#65d6e4; }
+.story-icon { display:grid; place-items:center; width:38px; height:38px; flex:0 0 38px; border:1px solid #0B3D91; border-radius:11px; background:#0B3D91; color:#FFFFFF; }
 .story-icon.amber { border-color:#65532b; background:#2b2515; color:#f4c967; }
 .story-heading .eyebrow { margin-bottom:5px; }
 .story-heading h3 { margin:0; color:#e6eef8; font-size:15px; font-weight:600; }
 .observation-list { display:grid; }
-.observation-row { display:grid; grid-template-columns:34px minmax(0,1fr) 125px; align-items:center; gap:13px; padding:16px 0; border-top:1px solid #1d2e45; }
+.observation-row { display:grid; grid-template-columns:34px minmax(0,1fr) 125px; align-items:center; gap:13px; padding:16px 0; border-top:1px solid #2A2A2E; }
 .observation-symbol { display:grid; place-items:center; width:32px; height:32px; border-radius:9px; }
 .observation-symbol.rose { color:#fb7185; background:#321d2a; }
 .observation-symbol.cyan { color:#22d3ee; background:#102a38; }
@@ -15,9 +15,9 @@
 .observation-title { color:#dbe6f3; font-size:11px; font-weight:600; }
 .observation-main p { margin:5px 0 0; color:#879ab3; font-size:10px; line-height:1.65; }
 .observation-meta { color:#71869f; font:500 8px/1.6 var(--mono); text-align:right; }
-.relationship-footnote { display:flex; align-items:center; gap:8px; padding:10px 12px; border:1px solid #233b50; border-radius:8px; background:#0e1d2e; color:#8da4bd; font-size:9px; }
+.relationship-footnote { display:flex; align-items:center; gap:8px; padding:10px 12px; border:1px solid #2A2A2E; border-radius:8px; background:#17171B; color:#FFFFFF; font-size:9px; }
 .agency-compare { display:grid; grid-template-columns:minmax(0,1fr) 56px minmax(0,1fr); align-items:stretch; }
-.agency-panel { padding:17px; border:1px solid #283d56; border-radius:11px; background:#0e1a2a; }
+.agency-panel { padding:17px; border:1px solid #2A2A2E; border-radius:11px; background:#17171B; }
 .bom-panel { border-top:2px solid #d5a843; }
 .imd-panel { border-top:2px solid #438ebc; }
 .agency-heading { display:flex; align-items:center; justify-content:space-between; gap:8px; color:#a7b7ca; font-size:10px; }
@@ -28,14 +28,14 @@
 .agency-panel p { margin:6px 0 12px; color:#d0dceb; font:500 10px var(--mono); }
 .agency-panel small { color:#6f849c; font-size:9px; }
 .agency-separator { display:grid; place-items:center; position:relative; color:#60738b; font:600 8px var(--mono); }
-.agency-separator i { position:absolute; height:68%; width:1px; background:#233650; z-index:0; }
-.agency-separator span { z-index:1; padding:7px; border:1px solid #2a3d56; border-radius:50%; background:#101b2d; }
+.agency-separator i { position:absolute; height:68%; width:1px; background:#2A2A2E; z-index:0; }
+.agency-separator span { z-index:1; padding:7px; border:1px solid #2A2A2E; border-radius:50%; background:#17171B; }
 .iod-note { display:flex; align-items:flex-start; gap:9px; padding:12px; border:1px solid #4b4228; border-radius:9px; background:#201d17; color:#d4bd7c; font-size:9px; line-height:1.6; }
 .iod-note svg { flex:0 0 auto; margin-top:1px; }
-.relationship-interpretation { display:grid; gap:12px; border-color:#224b5b; background:linear-gradient(130deg,#102537,#102030); }
+.relationship-interpretation { display:grid; gap:12px; border-color:#2A2A2E; background:#17171B; }
 .relationship-interpretation h3 { margin:0; color:#e6effa; font-size:16px; font-weight:600; }
 .interpretation-columns { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:13px; margin:4px 0; }
-.interpretation-columns > div { padding:13px; border:1px solid #263c53; border-radius:10px; background:#0c1a29aa; }
+.interpretation-columns > div { padding:13px; border:1px solid #2A2A2E; border-radius:10px; background:#0A0A1A; }
 .interpretation-number { color:#5dc5d4; font:600 9px var(--mono); }
 .interpretation-columns p { margin:7px 0 0; color:#a0b1c4; font-size:10px; line-height:1.65; }
 .relationship-interpretation .text-link { width:fit-content; margin:0; border:0; }

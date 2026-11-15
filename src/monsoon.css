@@ -1,10 +1,10 @@
 .monsoon-page { gap:16px; }
-.monsoon-total { display:grid; grid-template-columns:minmax(200px,.75fr) minmax(0,1.25fr); gap:24px; align-items:center; padding:25px; border-color:#20524f; background:radial-gradient(ellipse at 17% 50%,#164a4428,transparent 39%),linear-gradient(110deg,#102332,#102b2d); }
+.monsoon-total { display:grid; grid-template-columns:minmax(200px,.75fr) minmax(0,1.25fr); gap:24px; align-items:center; padding:25px; border-color:#2A2A2E; background:#17171B; }
 .monsoon-total-main { padding-left:5px; }
 .monsoon-total-value { margin:9px 0 0; color:#b5fff1; font:700 clamp(43px,6vw,66px) var(--mono); letter-spacing:-.09em; line-height:1; }
 .monsoon-total-value span { margin-left:3px; color:#36d4b8; font-size:.5em; letter-spacing:-.04em; }
 .monsoon-total-caption { margin-top:8px; color:#83aaab; font-size:11px; }
-.monsoon-total-details { padding-left:24px; border-left:1px solid #28605c; }
+.monsoon-total-details { padding-left:24px; border-left:1px solid #2A2A2E; }
 .rainfall-comparison { display:grid; grid-template-columns:1fr 42px 1fr; align-items:center; }
 .rainfall-comparison > div:not(.comparison-divider) { display:grid; gap:6px; }
 .rainfall-comparison span { color:#819aab; font:500 9px var(--mono); }
@@ -16,7 +16,7 @@
 .regional-context { display:grid; gap:13px; }
 .regional-context > .eyebrow { margin-bottom:-5px; }
 .regional-context-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:13px; }
-.regional-context-grid article { display:flex; align-items:flex-start; gap:11px; padding:14px; border:1px solid #233850; border-radius:10px; background:#0d1928; }
+.regional-context-grid article { display:flex; align-items:flex-start; gap:11px; padding:14px; border:1px solid #2A2A2E; border-radius:10px; background:#17171B; }
 .regional-context-grid strong { color:#dbe7f4; font-size:10px; }
 .regional-context-grid p { margin:5px 0; color:#8ea1b8; font-size:10px; line-height:1.6; }
 .regional-context-grid small { color:#657b94; font:400 8px var(--mono); }

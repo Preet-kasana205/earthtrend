@@ -123,8 +123,8 @@ body .stat-card { min-height: 220px !important; }
 body .stat-value { white-space: normal !important; overflow-wrap: anywhere; }
 body .stat-card-bottom { align-items: flex-start; flex-wrap: wrap; justify-content: flex-start; }
 body :is(.data-badge, .trend-label) { white-space: normal !important; }
-body .section-heading { border-left: 2px solid #2b6575; padding-left: 12px; }
-body .nav-link.active { box-shadow: inset 3px 0 var(--cyan) !important; }
+body .section-heading { border-left: 2px solid var(--border-strong); padding-left: 12px; }
+body .nav-link.active { box-shadow: inset 3px 0 #FFFFFF !important; }
 
 body .overview-page { gap: 12px !important; }
 body .overview-page .overview-banner { min-height: 0; padding: 12px 20px 30px; }
@@ -165,7 +165,7 @@ body .page-finding {
 }
 body .page-finding-value,
 body .key-finding-value {
-  color: #e7eef9;
+  color: #FC3D21;
   font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace !important;
   font-size: 30px !important;
   font-weight: 600 !important;
@@ -176,7 +176,7 @@ body .key-finding-value {
 body .page-finding-copy strong,
 body .key-finding-card > strong {
   display: block;
-  color: #dce8f6;
+  color: #FFFFFF;
   font-size: 18px !important;
   font-weight: 500 !important;
   line-height: 1.4;
@@ -207,15 +207,15 @@ body .method-details {
   padding: 14px 16px;
   border: 1px solid var(--border-strong);
   border-radius: 11px;
-  background: #0d1928;
+  background: var(--panel);
 }
 body .method-details > summary {
-  color: #9bd5dc;
+  color: #FFFFFF;
   font-size: 14px !important;
   font-weight: 500;
   cursor: pointer;
 }
-body .method-details > summary:focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; }
+body .method-details > summary:focus-visible { outline: 2px solid var(--border-strong); outline-offset: 4px; }
 body .method-details-content { display: grid; gap: 14px; min-width: 0; }
 body .method-details-content > :first-child { margin-top: 0; }
 body .method-details-content > :last-child { margin-bottom: 0; }

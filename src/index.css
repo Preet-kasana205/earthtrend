@@ -3,8 +3,8 @@
 
 :root {
   font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
-  color: #e7eef9;
-  background: #080f1c;
+  color: #FFFFFF;
+  background: #0A0A1A;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -13,8 +13,8 @@
 }
 
 * { box-sizing: border-box; }
-html { min-width: 320px; background: #080f1c; }
-body { margin: 0; min-width: 320px; min-height: 100vh; background: #080f1c; }
+html { min-width: 320px; background: #0A0A1A; }
+body { margin: 0; min-width: 320px; min-height: 100vh; background: #0A0A1A; }
 button, input, select { font: inherit; }
 button { color: inherit; }
-::selection { background: #06b6d4; color: #03111b; }
+::selection { background: #FC3D21; color: #FFFFFF; }
