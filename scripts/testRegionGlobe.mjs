@@ -52,6 +52,7 @@ assert.ok(globeSource.includes("labelsData={labelsData}"), "Readable region labe
 assert.equal((overviewSource.match(/<StatCard\b/g) ?? []).length, 4, "Snapshot cards must be rendered once each");
 assert.ok(overviewStyles.includes("grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr)"), "Desktop Overview row must position globe and cards side by side");
 assert.ok(overviewStyles.includes("grid-template-columns:repeat(2,minmax(0,1fr))"), "The bottom two cards must share the left-column width equally");
+assert.ok(overviewStyles.includes(".overview-bottom-snapshot-grid { grid-column:1/-1"), "The bottom two cards must span the full desktop composition width");
 assert.ok(overviewStyles.includes("grid-template-columns:minmax(0,1fr)"), "Mobile Overview composition must collapse without horizontal overflow");
 assert.ok(overviewStyles.includes("height:380px"), "Desktop globe height must be about 380px");
 assert.ok(overviewStyles.includes("height:320px"), "Mobile globe height must remain about 320px");
