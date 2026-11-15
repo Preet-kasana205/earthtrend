@@ -92,4 +92,4 @@ npm run data:extract
 
 ## AI development tools
 
-AI tools used during project work: **Muse, Google AI Studio, Codex (free), and Antigravity**.
+AI tools used during project work: **Muse,  Chatgpt , and Antigravity**.
