@@ -1,7 +1,9 @@
 import "../overview.css";
+import { lazy, Suspense } from "react";
 import { ArrowUpRight, Database, Globe2, MapPin, MoveRight } from "lucide-react";
 import { StatCard } from "../components/StatCard";
 import { InteractiveOverviewMap } from "../components/InteractiveOverviewMap";
+const RegionGlobe = lazy(() => import("../components/RegionGlobe").then((module) => ({ default: module.RegionGlobe })).catch(() => ({ default: () => null })));
 import { ScientificCaveat } from "../components/ScientificCaveat";
 import { PageFinding, PageSummary } from "../components/PageFinding";
 import { iod, monsoon2026, nino34, pacificRainfall } from "../data/realData";
@@ -47,6 +49,8 @@ export function OverviewPage({ onNavigate }: { onNavigate: (page: PageId, select
         <div className="overview-banner-mark" aria-hidden="true"><Globe2 size={94} strokeWidth={0.8} /><span /></div>
         <div className="banner-footnote"><span className="status-dot" />Verified Source Data <i /> Frozen 13 Nov 2026</div>
       </div>
+
+      <Suspense fallback={null}><RegionGlobe onNavigate={onNavigate} /></Suspense>
 
       <div className="section-heading-row">
         <div><div className="eyebrow">Verified observations</div><h3 className="section-heading">Signals in this snapshot</h3></div>
