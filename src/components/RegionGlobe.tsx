@@ -8,8 +8,7 @@ import type { RegionGlobeMarkerName } from "../lib/regionGlobeMarkers.js";
 import type { TrendSelection } from "../lib/overviewMapRegions.js";
 
 const EARTH_TEXTURE_URL = "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg";
-const GLOBE_HEIGHT_DESKTOP = 500;
-const GLOBE_READY_TIMEOUT_MS = 15000;
+const GLOBE_HEIGHT_DESKTOP = 380;
 
 let webGlAvailable: boolean | undefined;
 
@@ -46,8 +45,19 @@ function GlobeSurface({ onNavigate }: { onNavigate: (selection: TrendSelection) 
   const [dimensions, setDimensions] = useState({ width: 0, height: GLOBE_HEIGHT_DESKTOP });
   const containerRef = useRef<HTMLDivElement>(null);
   const globeRef = useRef<GlobeMethods | undefined>(undefined);
-  const globeReadyRef = useRef(false);
-  const pointsData = useMemo(() => regionGlobeMarkers.map((marker) => ({ ...marker })), []);
+  const controlsInitializedRef = useRef(false);
+  const cameraInitializedRef = useRef(false);
+  const controlErrorLoggedRef = useRef(false);
+  const navigateRef = useRef(onNavigate);
+  const pointsData = useMemo(() => regionGlobeMarkers.map((marker, index) => ({
+    ...marker,
+    color: ["#67e8f9", "#2dd4bf", "#a5f3fc"][index],
+  })), []);
+  const labelsData = useMemo(() => regionGlobeMarkers.map((marker) => ({ ...marker })), []);
+
+  useEffect(() => {
+    navigateRef.current = onNavigate;
+  }, [onNavigate]);
 
   useEffect(() => {
     const image = new Image();
@@ -91,15 +101,50 @@ function GlobeSurface({ onNavigate }: { onNavigate: (selection: TrendSelection) 
     };
   }, [failed, textureReady]);
 
+  const initializeControls = useCallback(() => {
+    if (controlsInitializedRef.current) return true;
+
+    try {
+      const globe = globeRef.current;
+      if (!globe) return false;
+
+      const controls = globe.controls();
+      if (!controls) return false;
+
+      controls.autoRotate = true;
+      controls.autoRotateSpeed = 1.8;
+      controls.enableZoom = true;
+      controls.enableRotate = true;
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.08;
+
+      if (!cameraInitializedRef.current) {
+        globe.pointOfView({ lat: 20, lng: 90, altitude: 2.0 }, 0);
+        cameraInitializedRef.current = true;
+      }
+
+      controlsInitializedRef.current = true;
+      return true;
+    } catch (error) {
+      if (!controlErrorLoggedRef.current) {
+        console.error("EarthTrend globe controls are not available yet; retrying initialization.", error);
+        controlErrorLoggedRef.current = true;
+      }
+      return false;
+    }
+  }, []);
+
   useEffect(() => {
     if (!textureReady || failed) return;
 
-    const timeoutId = window.setTimeout(() => {
-      if (!globeReadyRef.current) setFailed(true);
-    }, GLOBE_READY_TIMEOUT_MS);
+    if (initializeControls()) return;
 
-    return () => window.clearTimeout(timeoutId);
-  }, [failed, textureReady]);
+    const retryId = window.setInterval(() => {
+      if (initializeControls()) window.clearInterval(retryId);
+    }, 100);
+
+    return () => window.clearInterval(retryId);
+  }, [failed, initializeControls, textureReady]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -110,29 +155,11 @@ function GlobeSurface({ onNavigate }: { onNavigate: (selection: TrendSelection) 
     return () => container.removeEventListener("webglcontextlost", handleContextLoss, true);
   }, [failed, textureReady]);
 
-  const handleGlobeReady = useCallback(() => {
-    try {
-      const globe = globeRef.current;
-      if (!globe) throw new Error("Globe controls were not initialized");
-
-      const controls = globe.controls();
-      controls.autoRotate = true;
-      controls.autoRotateSpeed = 0.32;
-      controls.enableZoom = true;
-      controls.enableDamping = true;
-      controls.dampingFactor = 0.08;
-      globe.pointOfView({ lat: 12, lng: -40, altitude: 2.15 }, 0);
-      globeReadyRef.current = true;
-    } catch {
-      setFailed(true);
-    }
-  }, []);
-
   const handlePointClick = useCallback((point: object) => {
     const markerName = (point as { name?: RegionGlobeMarkerName }).name;
     const region = overviewMapRegions.find((item) => item.name === markerName);
-    if (region) onNavigate(region.selection);
-  }, [onNavigate]);
+    if (region) navigateRef.current(region.selection);
+  }, []);
 
   if (failed || !textureReady) return null;
 
@@ -153,13 +180,22 @@ function GlobeSurface({ onNavigate }: { onNavigate: (selection: TrendSelection) 
             pointLat="lat"
             pointLng="lng"
             pointLabel="name"
-            pointColor={() => "#06b6d4"}
-            pointAltitude={0.012}
-            pointRadius={1.2}
+            pointColor="color"
+            pointAltitude={0.02}
+            pointRadius={1.8}
             pointResolution={10}
             pointsTransitionDuration={0}
+            labelsData={labelsData}
+            labelLat="lat"
+            labelLng="lng"
+            labelText="name"
+            labelSize={0.8}
+            labelColor={() => "#e0f7ff"}
+            labelAltitude={0.055}
+            labelDotRadius={0.2}
+            labelResolution={2}
             onPointClick={handlePointClick}
-            onGlobeReady={handleGlobeReady}
+            onGlobeReady={initializeControls}
             animateIn={false}
             waitForGlobeReady={false}
             rendererConfig={{ antialias: true, alpha: true, powerPreference: "low-power" }}
